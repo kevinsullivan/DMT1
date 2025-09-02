@@ -1,6 +1,8 @@
 /- @@@
 # Deductive Reasoning : The Case of *And*
 
+<!-- toc -->
+
 As computer scientists we are not only users but designers
 of diverse logics. Every programming language is a logic.
 And with each programming language are many elements of the
