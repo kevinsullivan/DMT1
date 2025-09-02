@@ -56,24 +56,11 @@ axiom R : Prop      -- assume R is a proposition
 #check "Hello!"     -- a string
 
 /- @@@
-## Proposition Builders: *And*
+## Proposition Constructors: *And*
 
 With P, Q, and R accepted as propositions, we can form
 exponentially growing propositions by the the repeated
 application of *And* starting with the ones we have.
-@@@ -/
-
-/- @@@
-##
-In Lean, propositions are terns (objects, values), too,
-so we can give propositions names, too. Here, we bind the
-name *PandQ* to the proposition, P ∧ Q, as its value. We
-then use #reduce to evaluate *PandQ* to it's meaning, with
-a mysterious bit of syntax intructs Lean to reduce names
-for propositions into the propositions they name. Later
-we'll see that propositions are types in Lean, at which
-point the inscrutibility of this little snippet of code
-will resolve.
 @@@ -/
 
 def PandQ : Prop := And P Q   -- abstract syntax
@@ -81,6 +68,13 @@ def PandQ' : Prop := P ∧ Q    -- concrete notation
 
 #check PandQ
 #check PandQ'
+
+def PandQ2 : Prop :=  PandQ ∧ PandQ
+def PandQ3 : Prop := PandQ2 ∧ PandQ2
+def PandQ4 : Prop := PandQ3 ∧ PandQ3
+def PandQ5 : Prop := PandQ4 ∧ PandQ4
+
+#reduce (types := true) PandQ5
 
 
 /- @@@
@@ -103,13 +97,14 @@ axiom r : R
 
 
 /- @@@
-## Proof Builders: *And.intro*
+## Proof Constructors: *And.intro*
 
-Just as logical *connectives* compose given
-propositions into larger propositions, so we
-also have "little programs" for composing proofs
+Just as logical *connectives* (proposition
+constructors) compose given propositions into new
+and larger ones, so we also have little programs,
+namely *inference rules&, for composing the proofs
 of given propositions into proofs of larger ones
-made from them.
+that are composed from smaller ones.
 
 As an example, consider this. So far we have:
 
@@ -148,7 +143,7 @@ def pq_r' :  (P ∧ Q) ∧ R  :=  ⟨ ⟨ p, q ⟩, r ⟩
   C5
 
 /- @@@
-## *Using* Proofs: aka Elimination
+## Proof Consumers: *And.left* and *And.right*
 
 Just as we have ways of composing proofs of smaller
 propositions into proofs of larger ones, so we have
