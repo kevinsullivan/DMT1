@@ -1,5 +1,34 @@
 /- @@@
-# Deductive Reasoning : The Case of Conjunction
+# Deductive Reasoning : The Case of *And*
+
+As computer scientists we are not only users but designers
+of diverse logics. Every programming language is a logic.
+And with each programming language are many elements of the
+logics we will study in this class. In predicate logic, the
+primary logic of mathematics, the notion of *And* is specific:
+*P ∧ Q* is true iff and only if each of *P* and *Q* is (in
+a given world).
+
+One *could* define *And* differently, e.g., to mean *and then*,
+as in *they robbed a bank and (then) got in big trouble*. That's
+a great idea but leads to *temporal logics*. These logics are
+incredibly useful for reasoning about software with its often
+deeply sequential nature (semicolon means do that *and then*
+do this). If you want to learn about temporal logic for computer
+scientists, a good place to start would be with Leslie Lamport's
+[Temporal Logic of Actions](https://lamport.azurewebsites.net/tla/hyperbook.html?back-link=tools.html#documentation).
+
+As you study this material, again take note of how one specific
+meaning of *And* is enforced by the definitions of the inference
+rules chosen for it. There is no sense of temporal order mattering.
+Indeed, the designers of predicate logic defined *And* with a full
+understanding that that meant that order would not matter. By the
+time you get to the end of this chapter, you should be thinking
+this: "I see that meaning is unchanged by swapping the order of
+arguments to *And*; but (1) how would I express that idea with
+mathematical precision and full generality, and (2) how would I
+construct a proof to show that that the resulting proposition is
+true?*
 @@@ -/
 namespace DMT1.L00_reasoning
 
@@ -25,33 +54,15 @@ axiom R : Prop      -- assume R is a proposition
 #check "Hello!"     -- a string
 
 /- @@@
-## Proposition Builders: The Case of *And*
-With P, Q, and R accepted axiomatically as propositions,
-we can form exponentially growing larger propositions
-by the iterated (repeated) application of *And.intro* to
-increasingly large sub-propositions as arguments, starting
-with the elementary propositions we just assumed we will
-be given. All we need now is to be able to give short
-names to large expressions. So here we go.
+## Proposition Builders: *And*
+
+With P, Q, and R accepted as propositions, we can form
+exponentially growing propositions by the the repeated
+application of *And* starting with the ones we have.
 @@@ -/
 
 /- @@@
-In Lean, we can give names to arbitrary terms and then
-use those names anywhere we *mean* those terms. Here we
-bind the identifier (name), *n*, to the natural number,
-five, usually written as *5* in Lean. Evaluating the
-expression, *n* then reduces to the value it's bound to,
-namely, *5*.
-
-@@@ -/
-
-def n : Nat := 5    -- n is a Nat, with 5 as a witness
-#eval n             -- n evaluates to *5*
-#reduce n           -- reduce works too
-#eval n + 5         -- all kinds of expressions reduce
-
-
-/- @@@
+##
 In Lean, propositions are terns (objects, values), too,
 so we can give propositions names, too. Here, we bind the
 name *PandQ* to the proposition, P ∧ Q, as its value. We
@@ -63,16 +74,21 @@ point the inscrutibility of this little snippet of code
 will resolve.
 @@@ -/
 
-def PandQ : Prop := P ∧ Q
+def PandQ : Prop := And P Q   -- abstract syntax
+def PandQ' : Prop := P ∧ Q    -- concrete notation
+
 #check PandQ
-#reduce (types := true) PandQ
+#check PandQ'
 
 
 /- @@@
-We've already discussed proofs. Let's now assume that we have
-a few and see what we can do with them. In particular, let's
-assume that we have proofs (proof objects), p, q, and r, proving
-P, Q, and R, respectively. Here's how we now say that *formally*.
+## Proofs
+
+Let's now assume that we have proofs of these propositions.
+In other words, let's assume each proposition is true, and
+that its truth is *witnessed* by a corresponding proof object.
+In particular, assume we have proofs, *p, q,* and *r*, of
+*P, Q,* and *R*, respectively. Here we say that formally.
 @@@ -/
 
 axiom p : P
@@ -84,17 +100,40 @@ axiom r : R
 #check p    -- a proof of it
 
 
--- Construct proof of P ∧ Q using And.intro
+/- @@@
+## Proof Builders: *And.intro*
+
+Just as logical *connectives* compose given
+propositions into larger propositions, so we
+also have "little programs" for composing proofs
+of given propositions into proofs of larger ones
+made from them.
+
+As an example, consider this. So far we have:
+
+- *P* and *Q* are propositions
+- because they are, so is P ∧ Q
+- *p* and *q* are proofs of P, Q
+- And.intro is a function
+  - in: (P Q : Prop) (p : P) (q : Q)
+  - out: (And.intro p q) : P ∧ Q
+- notation: for And.intro p q, ⟨ p, q ⟩
+@@@ -/
+
+
+-- Two ways of writing the same concept
 def pq :    P ∧ Q    :=  And.intro p q
 def pq' :   P ∧ Q    :=  ⟨ p, q ⟩
 
--- Construct nested proofs of nested propositions
+
+-- nested proofs in this case for nested propositions
 def p_qr :  P ∧ (Q ∧ R)  :=  And.intro p (And.intro q r)
 def p_qr' :  P ∧ (Q ∧ R)  :=  ⟨ p, ⟨ q, r ⟩ ⟩
 
--- Here with the nesting in the other order
+-- nesting in the other order
 def pq_r :  (P ∧ Q) ∧ R  :=  And.intro (And.intro p q) r
 def pq_r' :  (P ∧ Q) ∧ R  :=  ⟨ ⟨ p, q ⟩, r ⟩
+
 
 -- Just 6 applications of ∧ gets us 64 Ps!
 #reduce (types := true)
@@ -107,7 +146,7 @@ def pq_r' :  (P ∧ Q) ∧ R  :=  ⟨ ⟨ p, q ⟩, r ⟩
   C5
 
 /- @@@
-## Proof Destructure-ers: aka Eliminators
+## *Using* Proofs: aka Elimination
 
 Just as we have ways of composing proofs of smaller
 propositions into proofs of larger ones, so we have
