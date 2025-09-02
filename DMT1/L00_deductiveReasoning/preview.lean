@@ -40,13 +40,13 @@ and Booleans. Here's an example.
 @@@ -/
 
 def fiveIsTwoPlusThree : Prop := 5 = 2 + 3   -- a proposition
-def p : fiveIsTwoPlusThree := rfl            -- a proof of it
+def proof5p2e3 : fiveIsTwoPlusThree := rfl            -- a proof of it
 
 def threeIsFiveMinusTwo : Prop := 3 = 5 - 2   -- another proposition
-def q : threeIsFiveMinusTwo := rfl            -- a proof of it
+def proof3e5m2 : threeIsFiveMinusTwo := rfl            -- a proof of it
 
 def PimpQ : Prop := fiveIsTwoPlusThree → threeIsFiveMinusTwo  -- conjunction
-def pimpq : PimpQ := fun pfP => q
+def pimpq : PimpQ := fun pfP => proof3e5m2
 
 /- @@@
 ### Iff (↔)
