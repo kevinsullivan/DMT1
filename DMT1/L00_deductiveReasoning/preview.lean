@@ -1,6 +1,9 @@
 /- @@@
 # Expressing Richer Ideas
 
+This document as posted includes notes taken in real
+time.
+
 <!-- toc -->
 
 To formally represent richer, more interesting, and
@@ -40,6 +43,82 @@ a simple function, albeit one works on logical propositions
 and proof objects, not ordinary data values such as strings
 and Booleans. Here's an example.
 @@@ -/
+
+
+/-- one plus one equals two -/
+def oot : Prop := 1 + 1 = 2
+
+/--
+In the mathematical system familiar to all
+as natural number arithment, this proposition
+is evidently true. In constructive mathematics
+(including logic) we'll clearly want *1 + 1 = 2*
+to be true, and it is, but is only because there
+is a proof of it.
+
+Where does that proof come from? The answer
+is that it comes from a mathematical *axiom*
+of logic we're learning, accepted just because
+it capture the mathematical idea of equality.
+
+The axiom says this: Suppose you have some
+Type, call it α (pronouned alpha). Example:
+α = Nat. Furthermore, suppose you have some
+value, (a : α), of this type.
+
+The equality introduction introduction rule
+then stiplulates that there is always a proof
+of the proposition, *a = a*. Think about it.
+It just says, in matheamtical language, that
+every object of every type is equal to itself.
+
+
+Lean calls this inference rule, Eq.refl; but
+we will use a shorthand for that called *rfl*.
+The name comes from the idea that equality is
+a *reflexive* relation: one under which every
+object is related to itself.
+
+Now we can see these ideas in action.
+@@@ -/
+
+def ootProof : 1 + 1 = 2 := rfl
+--  ^^^^^^^^^ ^^^^^^^^^^^   ^^^
+--   name     proposition   proof
+
+/- @@@
+Here's what just happened. Lean evaluated the
+term on the left, 1 + 1, by applying the *add*
+operation (+) to 1 and 1, reducing the original
+term, from 1 + 1 to 2. The term on the right is
+already just 2. What is fundamentally needed is
+a proof 2 = 2.
+
+Voila, the equality introduction rule! It's also
+just called *reflexivity*. In Lean it's called
+Eq.refl. This inference rule has two arguments:
+any type, α, and any value, (a : α), of that type.
+Applying this rule to such arguments then yields
+a term accepted axiomatically a proof of a = a.
+Note carfully: a single
+
+
+
+For equality propositions, in Lean, there
+is a proof builder (inference rule) that
+takes a single value (of any type) and
+returns a proof that that value is equal
+to itself. There is no other way to get
+a proof of an equality in Lean.
+2.
+
+-/
+
+
+
+
+def foo : Prop := (1+1=2) → (2+2=4)
+
 
 def fiveIsTwoPlusThree : Prop := 5 = 2 + 3   -- a proposition
 def proof5p2e3 : fiveIsTwoPlusThree := rfl            -- a proof of it
