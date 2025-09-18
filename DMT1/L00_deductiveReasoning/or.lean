@@ -8,6 +8,8 @@ Inference rules for And (∧)
 
 /- @@@
 Inference rules for Implies (→)
+- A proof of "P implies Q", is a function, (pf : P → Q)
+- Given *(pf : P → Q)* and *(p : P)*, then *(pf f : Q)*
 @@@ -/
 
 /- @@@
