@@ -28,7 +28,7 @@ squared.
 @@@ -/
 
 def square : Nat → Nat :=
-λ x => x^2
+  sorry
 
 /- @@@
 #1 [5 points].
@@ -116,7 +116,8 @@ replacing the *sorry* with your answer.
 
 def M : Nat → Nat → Nat := fun x y => x * y
 
-def M' : Nat → Nat := sorry
+def M' : Nat → Nat :=
+  sorry
 
 /- @@@
 #6 [10 points].
@@ -374,14 +375,27 @@ investigate this idea any further at this point.
 
 /- @@@
 #15 EXTRA CREDIT [10 points]. Define and give test
-cases for a polymorphic version of *ifThenElse*.
-Call it  *ifThenElsePoly*. It should take any type
-arguments *implicitly*.
+cases for a *polymorphic* version of *ifThenElse*.
+Call it  *ifThenElsePoly*. It should take a Bool as
+its first argument followed by two arguments of any
+specified type. It should take its type argument
+implicitly, so you should be able to write such
+expressions as *ite true "Hello" "Goodbye"* or
+*ite false true false* or *ite true 5 4*. These
+expressions always take a first argument of type
+Bool, and then two arguments of whatever type is
+specified by the value of the first argument, as
+the values to return on the true and false branches,
+respectively.
 @@@ -/
+
+-- Answer here
 
 
 /- @@@
-Closing thought: Alonzo Church was a genius. No one
+## Closing thought
+
+Alonzo Church was a genius. No one
 had even thought about electronic computers when he
 figured all of this out. Rather, he, Turing, and also
 Emil Post, were motivated by the question, what does
@@ -391,13 +405,16 @@ Each came up with his own answer. Turing gave us the
 Turning Machine (and a proof based on it that there
 are functions that no mechanical procedure can ever
 implement). Church gave us the lambda calculus. Post
-gave us (the less famous) Post Productions, which are
-basically rules for rewriting strings. Remarkably, all
-three models of computation were eventually shown to
-be completely equivalent in computational power.
+gave us (the less famous) *post productions*,, which
+are basically rules for rewriting strings. Remarkably,
+all three models of computation were then shown to be
+equivalent! A computation in one can always be turned
+into a computation in any of the other two models.
 
-As for us, the lambda calculus is a theory and now
-a host of industrial programming languages based on
-Church's theory of functions. You're computing with
-pure math.
+As for us, Church's  lambda calculus is a theory and
+also now, almost a hundred years later, the basis for
+or influence many industrial programming languages.
+You now have lambda abstractions, for example, in many
+languages, including Python and C++. Computing derives
+from pure mathematical logic.
 @@@ -/
