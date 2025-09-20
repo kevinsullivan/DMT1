@@ -1,10 +1,80 @@
 /- @@@
 # Implies (→)
+Suppose P and Q are arbitrary propositions
+@@@ -/
 
+axiom P : Prop
+axiom Q : Prop
+
+/-
+Then *P → Q* is also a proposition, called
+an *implication*. It proposes that whenever
+*P* is true so is *Q*. *P → Q* is true in a
+world if whenever *P* is true in that world,
+so is *Q*. An implication is read in English
+as *if P (is true) then Q (is true).*
+
+## Intuitive Explanation
+
+Here's an example: if (P) the temperature in
+the reactor vessel is too high, then (Q) the
+shutdown sequence is initiated, which can now
+be written in symbolic logic as *P → Q*.
+
+It should be clear immediately that if *Q*
+is true (e.g., the shutdown *is* initiated)
+then *P → Q* is true, because whenever *P*
+is true *Q* is. That's all that's needed to
+make *P → Q* true. The fact that *Q* is also
+true when *P* is false is irrelevant to the
+truth of *P → Q* in this case.
+
+One thing this case does show is that *P → Q*
+can be true even when it's premise/hypothesis,
+*P*, is false. For example, (0 = 1) → (1 = 1),
+which we can pronounce as "whenever 0 = 1 then
+1 = 1." This is true, because 1 = 1 is true no
+ matter what ("unconditionally"), so, as just
+ one special case of this generaliation, it's
+true whenever *P* is true. The fact that *P*
+is never true does not change these facts.
+
+It should also be clear that if *P* is true
+and *Q* is not, then *P → Q* is false, as *Q*
+is not true whenever *P* is.
+
+Such proposition have many uses. One use is
+to describe an unvarying pattern seen in the
+world.
+
+A *conjunction* is proposition that is
+true if and only if both conjuncts are
+true. An implication is
+
+Like *And*, implies, denoted →, is also
+a proposition builder with associated
+introduction and elimination inference
+rules.
+@@@ -/
+
+-- Then P → Q is also a proposition
+#check P ∧ Q
+#check P → Q
+
+ /- @@@
 ## Inference rules
+
+Again, inference rules explain how you can create
+and use proofs of propositions.
 
 ### Introduction
 To prove "P → Q", define a function, (pf : P → Q).
+
+For and, it says if
+you have proofs of P and of Q you can apply one of
+these rules, *And introduction*, or *And.intro* in
+Lean, to these proofs to get a proof of P ∧ Q.
+
 
 The reason this works is that functions in Lean are
 guaranteed to be *total*. That is, if Lean accepts a
@@ -34,42 +104,3 @@ with a proof of *R → W* being a function then when applied
 to a proof that it's raining yields a proof the ground is
 wet.
 @@@ -/
-
-/- @@@
-# More Examples
-@@@ -/
-
-axiom P : Prop
-axiom Q : Prop
-
-/- @@@
-If P ∧ Q is true, as witnessed by a proof, *h*,
-then Q∧ P must also be true, as a proof of that
-can always be derived from a proof of *P ∧ Q*.
-We give two proof constructions.
-
-The first definition we could say is top down.
-It applies *And.intro* to directly construct a
-proof of *Q ∧ P*. In the second proof, we first
-extract and give names to those proofs, and at
-the end we build and return the required proof
-using those values.
-@@@ -/
-
-theorem andAssoc : P ∧ Q → Q ∧ P :=
-  fun (pq : P ∧ Q) =>
-    And.intro
-      (pq.right)
-      (pq.left)
-
-theorem andAssoc' : P ∧ Q → Q ∧ P :=
-  fun (pq : P ∧ Q) =>
-    let p := pq.left
-    let q := pq.right
-    ⟨ q, p ⟩
-
--- For example, suppose we have a proof, pq, of P ∧ Q
-axiom pq : P ∧ Q
-
--- applying andAssoc to builds a proof of Q ∧ P from pq
-#check (andAssoc pq)  -- → elim is function application
