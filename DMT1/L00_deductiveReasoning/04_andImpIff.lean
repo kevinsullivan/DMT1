@@ -111,14 +111,13 @@ returns a proof that that value is equal
 to itself. There is no other way to get
 a proof of an equality in Lean.
 2.
-
 -/
 
 
 
+-- Notes taken in class
 
 def foo : Prop := (1+1=2) → (2+2=4)
-
 
 def fiveIsTwoPlusThree : Prop := 5 = 2 + 3   -- a proposition
 def proof5p2e3 : fiveIsTwoPlusThree := rfl            -- a proof of it
