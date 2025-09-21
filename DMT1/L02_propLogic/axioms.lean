@@ -18,13 +18,6 @@ open DMT1.L02_propLogic.syntax
 
 namespace DMT1.L02_propLogic.axioms
 
-#check
-  ∀ (P Q R : Prop),
-    (porq : P ∨ Q) ∧
-    (pimr : P → R) ∧
-    (qimr : Q → R ) →
-    R
-
 open Expr
 
 

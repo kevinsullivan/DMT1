@@ -1,6 +1,10 @@
 -- -- This module serves as the root of the `DMT1` library.
 -- -- Import modules here that should be built as part of the library.
 
+import DMT1.L00_deductiveReasoning.axiomsAndInference
+import DMT1.L00_deductiveReasoning.theorems
+import DMT1.L00_deductiveReasoning.preview
+
 -- -- propositional logic
 -- import DMT1.L02_propLogic.utilities
 -- import DMT1.L02_propLogic.domain
