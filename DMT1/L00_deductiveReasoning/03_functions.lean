@@ -1,18 +1,46 @@
 /- @@@
 # Functions
+
+<!-- toc -->
+
 @@@ -/
 
 /- @@@
-# Introduction
+## Introduction
 
-The way you introduce a new definition of a function,
-say of type S → T, where S and T are arbitrary types,
-you write a program that take and (s : S) as an input
-and that always returns some result, (t : T).
+The way you *introduce* a new function definition
+into your environment, of type S → T, where S and T
+are ant types, is you provide a lambda abstraction
+of this type. That lambda abstraction is a term such
+as *fun (n : Nat) => n+1*. Here S would be Nat and so
+would be T.
+@@@ -/
+
+def increment : Nat → Nat := fun n => n + 1
+#eval increment 0
+
+-- Let's break that down further
+
+def               -- keyword in Lean
+  increment'        -- name' bound to term
+  :                 -- read as "of type"
+  Nat → Nat         -- a function type
+  :=                -- separates type, value
+    fun             -- a function with
+    n               -- formal parameter n
+    =>              -- returning the value
+    n + 1           -- n + 1
+
+
+/- @@@
+Lean provides several different notations
+for defining named functions. Here we run
+through them using the preceding function as
+an example.
 @@@ -/
 
 
--- function type clear, explicit "fun/λ" expression gives value
+-- a "binary" (two-Nat-argument) function
 def myAdd : Nat → Nat → Nat  :=
   -- left side binds names to arguments for use on right side
   -- we can also say "let n1 and n2 be arbutrary Nat"
@@ -38,13 +66,55 @@ def notMyAdd : Nat → Nat → Nat :=
 /- @@@
 ## Elimination
 
-The way that you use a function definition is to
-apply it to an argument of the specified type. So,
+The way that you *use* a function definition is to
+*apply* it to an argument of the specified type. So,
 if, for example, $f : S → T$ is a (total) function
-and (s : S) then ((f s) : T). This is just the rule
-of *logical* reasoning that Aristotle called *modus
-ponens* reappearing as a fundamental concept in the
-world of computation.
+and (s : S) then ((f s) : T).
+
+Here's the elimination inference rule writen in the
+formal style you'd see in a textbook or research
+paper. Assumptions (arguments) are above the line;
+the conclusion is below the line; and a shortened
+name for the rule is to the right of the line.
+
+
+```lean
+(f : S → T) (s : S)
+-------------------- →-elim
+    (f s : T)
+```
+
+For short rules, they can also be written inline
+using a turnstile character instead of the line,
+like this: *(f : S → T) (s : S) ⊢ (f s : T)*.
+
+Computationally this rule states that if you have
+a (total) function, f, that takes S-type values in
+and returns T values, and you also have an S-value,
+s, then the type of value obtained by applying f to
+s is just T.
+
+```lean
+(String.length : String → Nat) (s : String)
+-------------------------------------------
+          (String.length s : Nat)
+```
+@@@ -/
+
+
+#check
+  let f := String.length
+  let s := "I love reasoning"
+  (f s)
+
+/- @@@
+This is just the computational analog of the
+rule of *deductive* reasoning that Aristotle
+called *modus ponens.* Example: If whenever it
+has rained the streets are wet (R → W), and if
+it has rained (R), then the streets are wet.
+
+## Functions with Multiple Arguments
 @@@ -/
 
 -- Application of
@@ -59,7 +129,7 @@ def n3 : Nat := myAdd 1 2
 #eval n3
 
 /- @@@
-## Partial Evaluation
+### Partial Evaluation
 But Prof. Sullivan, your example was of a function
 that takes just one parameter, and your add function
 takes two. What's up with that? Prof. Sullivan. Ah,
@@ -467,5 +537,6 @@ still hasn't matched, Lean will tell you there are
 *missing cases.
 -/
 
-def idBool : Bool → Bool
-| true => true
+-- Uncomment code to see error
+-- def idBool : Bool → Bool
+-- | true => true

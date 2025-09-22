@@ -1,5 +1,5 @@
 /- @@@
-# Deductive Reasoning : The Case of *And*
+# Deductive Reasoning : *And*
 
 <!-- toc -->
 
@@ -191,4 +191,7 @@ applications to navigate to nested sub-proofs.~
 #check pq_r.left.left
 #check pq_r.left.right
 
+/- @@@
+![No caption](./assets/diagrams/and.png)
+@@@ -/
 end DMT1.L00_reasoning
