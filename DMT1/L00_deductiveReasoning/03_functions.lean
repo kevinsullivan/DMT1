@@ -534,9 +534,9 @@ be accepted by Lean if it's total, meaning there's
 a result for *all* possible argument values. So if
 Lean gets to the end of the list of patterns and
 still hasn't matched, Lean will tell you there are
-*missing cases.
+*missing cases. Uncomment the following code to see
+such an error.
 -/
 
--- Uncomment code to see error
 -- def idBool : Bool → Bool
 -- | true => true
