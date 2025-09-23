@@ -28,7 +28,7 @@ squared.
 @@@ -/
 
 def square : Nat → Nat :=
-  sorry
+  λx => x * x
 
 /- @@@
 #1 [5 points].
@@ -49,6 +49,7 @@ should be the same.
 @@@ -/
 
 #eval (λ (n : Nat) => n^2) 5
+#eval (λ (n: Nat) => n^2) 3
 
 /- @@@
 #3 [5 points].
@@ -64,6 +65,9 @@ square.
 def square' : Nat → Nat :=
 λ y => y^2
 
+#eval square' 5
+
+
 /- @@@
 #4 [5 points].
 
@@ -76,6 +80,10 @@ Answer here:
 ANSWER: If the variable *y* already has
 a meaning in the application term. The new
 variable must not already be used in the code.
+
+If you rename the variable to be something already
+being used, you will now have two variables of the
+same name, which will not work.
 @@@ -/
 
 /- @@@
@@ -93,6 +101,7 @@ def add : Nat → Nat → Nat
 
 -- an application
 #eval add 2 3
+#eval add 6 7
 
 /- @@@
 Your job is to define the function, call
@@ -106,6 +115,8 @@ syntax that we've used to define *add*.
 def prAdd : Nat → Nat
 | n2 => 2 + n2
 
+#eval prAdd 4
+
 /- @@@
 #5 [5 points].
 
@@ -117,7 +128,9 @@ replacing the *sorry* with your answer.
 def M : Nat → Nat → Nat := fun x y => x * y
 
 def M' : Nat → Nat :=
-  sorry
+  fun y => 2 * y
+
+#eval M' 5
 
 /- @@@
 #6 [10 points].
@@ -144,16 +157,22 @@ should be 2 * 3 = 6.
 @@@ -/
 
 
+
 /- @@@
 #7 [10 points].
 
 Use #eval to the application, *apply (_) 2 3*, where _ is
 replaced with a lambda abstraction for Nat multiplication.
 @@@ -/
+
+/- apply takes a function f, that takes two nats, two other nats x and y and returns
+a nat-/
+
 def apply : (Nat → Nat → Nat) → Nat → Nat → Nat
 | f, x, y => f x y
 
 #eval apply (fun x y => x * y) 2 3
+#eval apply (fun x y => x + y) 3 4
 
 /- @@@
 #8 [10 points]
@@ -390,6 +409,21 @@ respectively.
 @@@ -/
 
 -- Answer here
+
+def ifThenElsePoly {α : Type} : Bool → α → α → α
+  | true, x, _ => x
+  | false, _, y => y
+
+#eval ifThenElsePoly true "Hello" "Goodbye"   -- "Hello"
+#eval ifThenElsePoly false "Hello" "Goodbye"  -- "Goodbye"
+
+#eval ifThenElsePoly true 5 4                 -- 5
+#eval ifThenElsePoly false 5 4                -- 4
+
+#eval ifThenElsePoly true true false          -- true
+#eval ifThenElsePoly false true false         -- false
+
+#check ifThenElsePoly
 
 
 /- @@@
