@@ -3,7 +3,6 @@
 
 <!-- toc -->
 
-
 Suppose P and Q are arbitrary propositions
 @@@ -/
 
@@ -74,37 +73,120 @@ and use proofs of propositions.
 ### Introduction
 To prove "P → Q", define a function, (pf : P → Q).
 
-For and, it says if
-you have proofs of P and of Q you can apply one of
-these rules, *And introduction*, or *And.intro* in
-Lean, to these proofs to get a proof of P ∧ Q.
-
-
 The reason this works is that functions in Lean are
 guaranteed to be *total*. That is, if Lean accepts a
 function definition as well-typed then you can be sure
 it returns a result for every possible value of the
-argument/input type. When the input is a proof of P,
-and a function can always then output a proof of Q,
-then we know that no matter how P has been proved to
-be true, there's a corresponding proof that Q is true.
-Such a function thus proves *if P is true then so is Q."
-We write that as *P → Q*.
+argument/input type. When the input is *any* proof of
+P, and a function can *always* output a proof of Q, we
+know that no matter how P has been proved to be true,
+there's a corresponding proof that Q is true. Such a
+function thus proves *if P is true then so is Q." In
+other words, is proves the implication, *P → Q*.
 
 ### Elimination
-Given *(pf : P → Q)* and *(p : P)*, *(pf p : Q)*,
-you *use pf* by *applying* it to any such *p*. You
-write the application of *pf* to *p* as *pf f*. This
-inference rule dates to Aristotle, who called it
-*modus ponens*.
 
-Examples in natural language.
+A proof, *h : P → Q* by itself isn't immediately useful.
+But if we also have a proof *p : P* then we can *apply*
+the proof *h* (a function) to *p* (a value) to derive
+a proof of *Q*. This inference rule dates to Aristotle,
+and in Latin is called *modus ponens*.
 
-If we have a proof, *rw*, that whenever it rains the
-ground is wet, *(R → W)*, and we have a proof, *(r : R)*
-that it is raining, then we can conclude that the ground
-is wet, *W*, and *rw r*. This idea is formalized in Lean
-with a proof of *R → W* being a function then when applied
-to a proof that it's raining yields a proof the ground is
-wet.
+Consider an example.
+
+If we have a proof, *rainWet*, showing that whenever it
+rains (R) the ground is wet (W), so *(R → W)*; and if we
+also have a proof, *(r : R)* that it is raining, then we
+can deduce that the ground is wet, *W* by *applying* the
+proof of *(R → W)* to the proof of *P* to derive a proof
+of *W*. Here's this example formalized in Lean.
 @@@ -/
+
+axiom pq : P → Q      -- assume (proof of) P → Q
+axiom p : P           -- assume (proof of) P
+#check pq p           -- deduce/derive (proof of) Q
+
+/- @@@
+One will sometimes see this rule written as follows.
+
+```lean
+(pq : P → Q) (p : P)
+-------------------- → elim
+      (q : Q)
+```
+
+It can be written inline as (pq : P → Q) (p : P) ⊢ Q.
+
+You can read ⊢ as entails and you can understand
+the rule as saying, if you're in a context where
+have have derived or assumed proofs of *P → Q* and
+*P* then you can derive a proof of *Q* by applying
+the → elimination inference rule. The rule is thus
+just a mathematical formalization of a valid (which
+is to say always correct) rule of logical reasoning.
+@@@ -/
+
+/- @@@
+## Theorem: Implication (→, arrow) is Transitive
+
+If some action, A, causes some action B, and if action B
+causes some action C, then what can you say about A and
+C? Answer: A causes C.
+
+For example, if whenever it rains (P) then the streets
+are wet (Q), i.e., (P → Q), and if whenever the streets
+are wet, they're Slippy, i.e., (Q → R), then what we
+want to conclude and provide is that whenever it rains
+the streets are Slippy (P → R).
+
+
+Given the axioms for implication (the introduction
+and elimination rules) what interesting facts about
+implication can we *deduce*. Here's one. Suppose you
+have three propositions, *P, Q,* and *R*.
+
+Show that if whenever *P* is true, so is *Q*, and if
+whenever *Q* is true, so is *R*, then whenever *P* is
+true so is *R*.
+@@@ -/
+
+
+
+theorem impTrans {P Q R : Prop} : (P → Q) → (Q → R) → (P → R)
+| pq, qr => fun p => qr (pq p)
+
+/- @@@
+Let's apply this *general* theorem which we've proved
+for *any* proposition, and apply it to the ones in our
+example.
+@@@ -/
+-- We've got P, Q as propositions, now R
+axiom Rain : Prop
+axiom Wet : Prop
+axiom Slippy : Prop
+
+axiom rainWet : Rain → Wet
+axiom wetSlippy : Wet → Slippy
+axiom rain : Rain
+
+example : Rain → Slippy := impTrans rainWet wetSlippy
+
+/- @@@
+Using our generalized proof that implication is
+transitive we can now apply this theorem to the
+special case of rain, wet roads, and slipperiness.
+@@@ -/
+
+
+theorem slippy : Slippy := (impTrans rainWet wetSlippy) rain
+
+-- Our theorem is a proof of an implication
+-- So it is formalized as a function
+-- And what we can do with a function
+
+#check (impTrans rainWet wetSlippy)
+
+-- Now given a proof *(p : P)*, we can derive a proof of *R*
+
+axiom p : P
+#check (impTrans rainWet wetSlippy) rain
