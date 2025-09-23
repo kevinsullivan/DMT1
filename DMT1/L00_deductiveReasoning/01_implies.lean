@@ -1,12 +1,16 @@
 /- @@@
 # Implies (→)
+
+<!-- toc -->
+
+
 Suppose P and Q are arbitrary propositions
 @@@ -/
 
 axiom P : Prop
 axiom Q : Prop
 
-/-
+/- @@@
 Then *P → Q* is also a proposition, called
 an *implication*. It proposes that whenever
 *P* is true so is *Q*. *P → Q* is true in a
@@ -87,7 +91,7 @@ be true, there's a corresponding proof that Q is true.
 Such a function thus proves *if P is true then so is Q."
 We write that as *P → Q*.
 
-## Elimination
+### Elimination
 Given *(pf : P → Q)* and *(p : P)*, *(pf p : Q)*,
 you *use pf* by *applying* it to any such *p*. You
 write the application of *pf* to *p* as *pf f*. This
