@@ -20,6 +20,7 @@ USER root
 RUN apt-get update --fix-missing && \
     apt-get install --no-install-recommends --assume-yes \
     build-essential \
+    ca-certificates \
     curl \
     git \
     git-lfs \
@@ -30,7 +31,6 @@ RUN apt-get update --fix-missing && \
     libssl-dev \
     locales \
     lsb-release \
-    pkg-config \
     python3-dev \
     python3-pip \
     python3-venv \
@@ -63,35 +63,13 @@ RUN useradd -m -s /bin/bash dev && \
     mkdir -p /home/dev/app && chown -R dev:dev /home/dev/app
 
 # Make the workspace path safe for Git even if mounted by host
-RUN git config --global --add safe.directory /home/dev/app
+RUN git config --global --add safe.directory /home/dev/
 
 # ----- Switch to USER=dev for user-scoped installs -----
 USER dev
 
+# -- Change directory to /home/dev --
 WORKDIR /home/dev
-
-# Put user-local tools and SDKMAN candidates on PATH globally for this image
-ENV SDKMAN_DIR="/home/dev/.sdkman" \
-    JAVA_HOME="/home/dev/.sdkman/candidates/java/current" \
-    PATH="/home/dev/.elan/bin:/home/dev/.local/bin:/home/dev/.sdkman/candidates/java/current/bin:/home/dev/.sdkman/candidates/gradle/current/bin:/home/dev/.sdkman/candidates/maven/current/bin:/usr/local/bin:${PATH}"
-
-# ----- SDKMAN (user-local) + Java/Maven/Gradle -----
-RUN curl -s "https://get.sdkman.io" | bash && \
-    bash -lc "source $SDKMAN_DIR/bin/sdkman-init.sh && \
-    sdk install gradle 7.5 && \
-    sdk install maven && \
-    sdk install java 11.0.17-amzn && \
-    sdk flush archives && sdk flush temp"
-
-# ----- elan + Lean toolchain (KEEP stable as requested) -----
-RUN curl -fsSL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y 
-
-# && \
-#     ~/.elan/bin/elan toolchain install leanprover/lean4:v4.22.0-rc4 && \
-#     ~/.elan/bin/elan default leanprover/lean4:v4.22.0-rc4
-
-# Workspace
-WORKDIR /home/dev/app
 
 # Keep the devcontainer running so VS Code can attach
 CMD ["sleep", "infinity"]
