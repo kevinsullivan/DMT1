@@ -111,8 +111,8 @@ One will sometimes see this rule written as follows.
 
 ```lean
 (pq : P → Q) (p : P)
--------------------- → elim
-      (q : Q)
+-------------------- →-elim
+      (pq p : Q)
 ```
 
 It can be written inline as (pq : P → Q) (p : P) ⊢ Q.
@@ -133,60 +133,148 @@ If some action, A, causes some action B, and if action B
 causes some action C, then what can you say about A and
 C? Answer: A causes C.
 
-For example, if whenever it rains (P) then the streets
-are wet (Q), i.e., (P → Q), and if whenever the streets
-are wet, they're Slippy, i.e., (Q → R), then what we
-want to conclude and provide is that whenever it rains
-the streets are Slippy (P → R).
+For example, if whenever it rains (R) then the streets
+are wet (W), i.e., (R → W), and if (also) whenever the
+streets are wet (W) they're Slippy (S), i.e., (W → S),
+then under these assumptions it must be that whenever
+it rains the streets are slippy, i.e., (P → R). Now we
+just put it all together: (R → W) → (W → S) → (R → S).
 
-
-Given the axioms for implication (the introduction
-and elimination rules) what interesting facts about
-implication can we *deduce*. Here's one. Suppose you
-have three propositions, *P, Q,* and *R*.
-
-Show that if whenever *P* is true, so is *Q*, and if
-whenever *Q* is true, so is *R*, then whenever *P* is
-true so is *R*.
+In English, if raining makes streets wet, then if (also)
+wet streets are slippy, the raining causes slippy streets.
 @@@ -/
 
-
-
-theorem impTrans {P Q R : Prop} : (P → Q) → (Q → R) → (P → R)
-| pq, qr => fun p => qr (pq p)
-
-/- @@@
-Let's apply this *general* theorem which we've proved
-for *any* proposition, and apply it to the ones in our
-example.
-@@@ -/
 -- We've got P, Q as propositions, now R
 axiom Rain : Prop
 axiom Wet : Prop
 axiom Slippy : Prop
 
-axiom rainWet : Rain → Wet
-axiom wetSlippy : Wet → Slippy
-axiom rain : Rain
+axiom rainWet : Rain → Wet      -- proof if rain then wet
+axiom wetSlippy : Wet → Slippy  -- proof if wet then slippy
+axiom rain : Rain               -- proof it's raining
 
-example : Rain → Slippy := impTrans rainWet wetSlippy
+#check wetSlippy (rainWet rain) -- proof it's slippy!
 
 /- @@@
-Using our generalized proof that implication is
-transitive we can now apply this theorem to the
-special case of rain, wet roads, and slipperiness.
+### Great Theorems are Generalizations
+In general, if A causes B, and also B causes C, then it
+must be the case that A cases C. In logical notation we
+can write *∀ (A B C : Prop), (A → B) → (B → C) → (A → C)*.
+In English, for *any* propositions, A, B, and C, given a
+proof of A → B and a proof of B → C one can construct a
+proof of A → C. Causality is transitive. Implication is
+transitive. We're saying the same thing. We can prove it.
+@@@-/
+
+theorem impTrans        -- "implication is transitive"
+  {P Q R : Prop} :      -- If P, Q, R are propositions
+    -- then
+    (P → Q) →           -- if given proof of P → Q then
+    (Q → R) →           -- if given proof of Q → R then
+    (P → R)             -- we can construct proof of P → R
+  -- name the incoming proofs pq and qr
+  | pq, qr =>           -- and return a proof of P → R
+    fun (p : P) =>      -- assume P is true with proof p
+      let q := pq p     -- we can prove Q by modus ponens
+      let r := qr q     -- and then prove R the same way
+      r                 -- QED: a proof of R
+
+/- @@@
+Here's one of several other ways you could give this
+proof. The most important somewhat abstract point to
+bear in mind is that a proof of implications (for us)
+is a total function, taking a proof of its premise and
+returning a proof of its conclusion. Just modus ponens.
+This presentation achieves clarity through minimality.
 @@@ -/
 
+theorem impTrans' {P Q R : Prop} :    -- P, R, R are props
+  (P → Q) → (Q → R) → (P → R) :=      -- what to prove
+    fun pq qr => fun p => qr (pq p)   -- proof of it
 
-theorem slippy : Slippy := (impTrans rainWet wetSlippy) rain
+/- @@@
+## Applying Theorems
 
--- Our theorem is a proof of an implication
--- So it is formalized as a function
--- And what we can do with a function
+Now we're at an interesting place. *impTrans* proves
+an implication. So it must be a function. So we must
+be able to apply it to arguments of the types that it
+expects. And indeed that's just the case. The whole
+point, in fact, of a general theorem is that you can
+apply it to special cases without having to prove them
+separately.
 
-#check (impTrans rainWet wetSlippy)
+For example, given that Rain, Wet, and Slippy are
+propositions, and given the type of its first three
+arguments, we should be able to *apply* the theorem
+to these three propositions, yielding with proposition
+(Rain → Wet) → (Wet → Slippy) → (Rain → Slippy) to be
+proved.
 
--- Now given a proof *(p : P)*, we can derive a proof of *R*
+Applying the theorem to just these three arguments
+does require one new trick. The proposition (type)
+arguments are marked as implicit. That means it's
+an error to give them explicitly when applying the
+theorem/function. The problem is that there will be
+no further arguments that Lean could use to infer
+the values of these arguments, so we'll have to give
+them explicitly. The trick is to temporarily turn
+off implicit arguments. That's what the @ does here.
+@@@ -/
 
-axiom p : P
+def rainMakesSlippy := @impTrans Rain Wet Slippy
+
+#check rainMakesSlippy
+
+/- @@@
+Applying a theorem to particulars specializes it
+to the case in question. That's what makes theorems
+the golded nuggests of mathematics. They are general
+results that can be specialized to many cases so that
+one need not construct a separate proof in each case.
+
+Theorems are the essential power tools of mathematical
+reasoning: a univeral theorem proven once generates an
+endless number of proofs of special cases. It goes into
+the permanent library of generalized knowledge and can
+be applied in innumerable special case.
+
+Here we apply impTrans to three particular proposition
+and end up with a result that we can inspect.
+@@@ -/
+
+#reduce (proofs := true) (@impTrans Rain Wet Slippy)
+
+/- @@@
+Lean tells us that this function application returns
+*fun x x_1 p => x_1 (x p)*. What is *that*? It's a
+function that takes (1) x, a proof of Rain → Wet,
+(2) x_1, a proof of Wet → Slippy, (3) p, a proof of
+of rain; and finally (4) applies x to p to prove
+wet, then applies x_1 to that proof of wet to get
+a proof of slippy. This part that takes p and returns
+a proof of Slippy has type (Rain → Slippy). So if
+you were to have proofs 1-2 you can derive a proof
+of Rain → Slippy.
+@@@ -/
+
+axiom rw : Rain → Wet
+axiom ws : Wet → Slippy
+
+theorem wetImpSlippy : Rain → Slippy := (@impTrans Rain Wet Slippy) rw ws
+
+/- @@@
+Finally if we have a proof of rain then we can derive
+proof of slippy.
+-/
+
+-- Drive carefully! It's slippery! Recall (rain : Rain).
+#check wetImpSlippy rain
+
+
+/- @@@
+To test your undertanding of what we've covered, explain
+precisely how and why the following term gives a proof
+of Slippy.
+@@@ -/
+
 #check (impTrans rainWet wetSlippy) rain
