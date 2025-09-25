@@ -34,6 +34,7 @@
             },
             "extensions": [
                 "-github.codespaces",
+                "-github.copilot-chat",
                 "formulahendry.auto-close-tag",
                 "formulahendry.auto-rename-tag",
                 "aaron-bond.better-comments",
@@ -93,5 +94,4 @@
             ]
         }
     }
-    // , "forwardPorts": [5037, 5038, 5555, 5554]
 }
