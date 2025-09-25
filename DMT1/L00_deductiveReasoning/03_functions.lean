@@ -1,18 +1,50 @@
 /- @@@
 # Functions
+
+<!-- toc -->
+
 @@@ -/
 
 /- @@@
-# Introduction
+## Introduction
 
-The way you introduce a new definition of a function,
-say of type S → T, where S and T are arbitrary types,
-you write a program that take and (s : S) as an input
-and that always returns some result, (t : T).
+The way you *introduce* a new function definition
+into your environment, of type S → T, where S and T
+are any types, is you provide a lambda abstraction
+of this type. What *(f : S → T)* proves is that *if*
+an *(s : S)* is provided then a value of type *T* can
+be derived, namely *(f s : T)*. A lambda abstraction
+is, again, a term such as *fun (n : Nat) => n + 1*
+that specifies how total function transforms values
+of its argument type into values of its return type.
+@@@ -/
+
+def increment : Nat → Nat := fun n => n + 1
+#eval increment 0
+
+-- Let's break that down further
+
+def               -- keyword in Lean
+  increment'        -- name' bound to term
+  :                 -- read as "of type"
+  Nat → Nat         -- a function type
+  :=                -- separates type, value
+    fun             -- a function with
+    n               -- formal parameter n
+    =>              -- returning the value
+    n + 1           -- n + 1
+
+
+/- @@@
+## Function Definition Notation Alternatives
+Lean provides several different notations
+for defining named functions. Here we run
+through them using the preceding function as
+an example.
 @@@ -/
 
 
--- function type clear, explicit "fun/λ" expression gives value
+-- a "binary" (two-Nat-argument) function
 def myAdd : Nat → Nat → Nat  :=
   -- left side binds names to arguments for use on right side
   -- we can also say "let n1 and n2 be arbutrary Nat"
@@ -31,20 +63,60 @@ def myAdd' :  Nat → Nat → Nat
 def myAdd''' : (n1 : Nat) → (n2 : Nat) → Nat  :=
   fun n1 n2 => n1 + n2
 
--- same function type, value as λ expression, not same function
-def notMyAdd : Nat → Nat → Nat :=
-  fun n1 n2 => n1 * n2
+
 
 /- @@@
-## Elimination
+## Elimination: By *Application* to an Argument
 
-The way that you use a function definition is to
-apply it to an argument of the specified type. So,
+The way that you *use* a function definition is to
+*apply* it to an argument of the specified type. So,
 if, for example, $f : S → T$ is a (total) function
-and (s : S) then ((f s) : T). This is just the rule
-of *logical* reasoning that Aristotle called *modus
-ponens* reappearing as a fundamental concept in the
-world of computation.
+and (s : S) then ((f s) : T).
+
+Here's the elimination inference rule writen in the
+formal style you'd see in a textbook or research
+paper. Assumptions (arguments) are above the line;
+the conclusion is below the line; and a shortened
+name for the rule is to the right of the line.
+
+
+```lean
+(f : S → T) (s : S)
+-------------------- →-elim
+    (f s : T)
+```
+
+For short rules, they can also be written inline
+using a turnstile character instead of the line,
+like this: *(f : S → T) (s : S) ⊢ (f s : T)*.
+
+Computationally this rule states that if you have
+a (total) function, f, that takes S-type values in
+and returns T values, and you also have an S-value,
+s, then the type of value obtained by applying f to
+s is just T.
+
+```lean
+(String.length : String → Nat) (s : String)
+-------------------------------------------
+          (String.length s : Nat)
+```
+@@@ -/
+
+
+#check
+  let f := String.length
+  let s := "I love reasoning"
+  (f s)
+
+/- @@@
+This is just the computational analog of the
+rule of *deductive* reasoning that Aristotle
+called *modus ponens.* Example: If whenever it
+has rained the streets are wet (R → W), and if
+it has rained (R), then the streets are wet.
+
+## Functions with Multiple Arguments
 @@@ -/
 
 -- Application of
@@ -59,7 +131,7 @@ def n3 : Nat := myAdd 1 2
 #eval n3
 
 /- @@@
-## Partial Evaluation
+### Partial Evaluation
 But Prof. Sullivan, your example was of a function
 that takes just one parameter, and your add function
 takes two. What's up with that? Prof. Sullivan. Ah,
@@ -316,6 +388,15 @@ It finally returns the second argument without
 any change.
 @@@ -/
 
+def identNat : Nat → Nat
+| n => n
+
+#eval (identNat 5)
+
+def identBool (b : Bool) := b
+
+#eval (identBool true)
+
 def ident (α : Type) (a : α) := a
 
 /- @@@
@@ -369,13 +450,114 @@ def ident2 {α : Type} (a : α) : α := a
 #eval ident2 false
 
 /- @@@
-That's some beautiful code. The *ident2* function
+That's some beautiful code! The *ident2* function
 appears to be applicable to objects of many different
 types with no extra effort needed to write the explicit
 type argument values. Be sure you compare and contrast
 this code with that using the first version of *ident.*
 @@@ -/
 
+/- @@@
+## Compose: A Binary Operations on Functions
+
+We familiar with mathematical operations on numbers. For
+example, addition takes two numbers as arguments and then
+returns a third. We'll now see that we can treat function
+as objects, just like numbers, and define operations on
+functions, as long as they are in sense composable.
+
+Suppose we have a function, *s2n* that can turn any String
+into a Nat, namely one representing its length, and we have
+another function, *n2b* that turns any Nat into a Bool: true
+if the number is even and false otherwise.
+
+From these two functions we should be able to define a new
+function that takes any String and returns true or false
+depending on  whether its length is even or not. Think
+about how you would do this in Python.
+
+This new function will take a String argument, *s*. It
+will first derive its length as *s2n s*. Then it will
+use this value as the argument to *n2b* to obtain the
+final result.
+@@@ -/
+
+#eval String.length "Hello"   -- String length in Lean
+
+def isEven (n : Nat) : Bool := n%2 == 0
+#eval isEven 5
+
+#eval isEven (String.length "Hello")
+#eval isEven (String.length "Hello!")
+
+/- @@@
+We can Generalize these examples to a parameterized function
+from String to Bool that takes any String and returns true or
+false depending on whether its length is even or odd.
+*** -/
+
+ def isEvLenStr (s : String) : Bool := isEven (String.length s)
+#eval isEvLenStr "Hello"
+#eval isEvLenStr "Hello!"
+
+/- @@@
+We can now generalize from String, Nat, and Bool to any
+three types whatsoever. Let's write α for any type instead
+of just String; β instead of just Nat, and γ instead of Bool.
+Furthermore, we'll generalize from *String → Nat* to α → β,
+and from Nat → Bool to *g : β → γ.* We'l also change the
+name to *compose*, the name in mathematics of the higher
+order function that takes two compatible functions and
+returns the function that applies the second one after
+applying the first one to its argument to convert any
+argument of type α into one of type γ.
+@@@ -/
+
+def compose {α β γ : Type} (f : α → β) (g : β → γ) :=
+  fun a => g (f a)
+
+-- alternative syntax
+def compose' {α β γ : Type} : (α → β) → (β → γ) → (α → γ)
+| f, g => (fun a => g (f a))
+
+/- @@@
+Composing String.length and isEven yields the function
+that applies String.length to an argument and applies isEven
+to the result: thus "isEven after String.length", which we
+can also write as (isEven ∘ String.length). We pronounce this
+expresion again as the function, "isEven *after* String.length."
+@@@ -/
+def isEvLenStr' : String → Bool := compose String.length isEven
+#eval isEvLenStr' "Hello"
+
+/- @@@
+It's defined in Lean's libraries in an even more
+general way, polymorphic in the type universes from
+which the functions are drawn. You can use apply it
+just as you would our version.
+@@@ -/
+#check Function.comp
+
+#eval compose String.length isEven "Hello"  -- application left assoc
+
+/- @@@
+Lean's library also defines the standard mathematical
+notation for compose viewed as a binary operation on
+functions.
+@@@ -/
+#eval (isEven ∘ String.length) "Hello!"
+
+/- @@@
+The compose operation is essential a function-building
+function. It takes functions as input arguments and then
+returns a function as a result. It is thus a higher-order
+function in both sense.
+@@@ -/
+def isEvenLengthString := compose String.length isEven
+
+#eval isEvenLengthString "Hello"
+#eval isEvenLengthString "Hello!"
+#eval isEvenLengthString "Hello!!"
 
 /- @@@
 ## Function Definition by Case Analysis
@@ -464,8 +646,9 @@ be accepted by Lean if it's total, meaning there's
 a result for *all* possible argument values. So if
 Lean gets to the end of the list of patterns and
 still hasn't matched, Lean will tell you there are
-*missing cases.
+*missing cases. Uncomment the following code to see
+such an error.
 -/
 
-def idBool : Bool → Bool
-| true => true
+-- def idBool : Bool → Bool
+-- | true => true

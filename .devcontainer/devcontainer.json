@@ -33,6 +33,8 @@
                 "python.analysis.typeEvaluation.deprecateTypingAliases": true
             },
             "extensions": [
+                "-github.codespaces",
+                "-github.copilot-chat",
                 "formulahendry.auto-close-tag",
                 "formulahendry.auto-rename-tag",
                 "aaron-bond.better-comments",
@@ -61,6 +63,8 @@
                 "ms-python.python",
                 "ms-python.debugpy",
                 "mechatroner.rainbow-csv",
+                "ms-vscode-remote.remote-containers",
+                "ms-vscode-remote.remote-ssh",
                 "ms-vscode-remote.remote-ssh-edit",
                 "ms-vscode.remote-server",
                 "ms-vscode-remote.vscode-remote-extensionpack",
@@ -81,14 +85,13 @@
                 "ms-vscode-remote.remote-ssh",
                 "github.vscode-pull-request-github",
                 "esbenp.prettier-vscode",
+                "numso.prettier-standard-vscode",
                 "vscjava.vscode-java-pack",
                 "ms-python.black-formatter",
                 "leanprover.lean4",
-                "GitHub.vscode-github-actions",
                 "dt.ghlink",
                 "denis-gorbachev.lean4-code-actions"
             ]
         }
     }
-    // , "forwardPorts": [5037, 5038, 5555, 5554]
 }
