@@ -137,10 +137,13 @@ axiom rock : Rock
 /- @@@
 Work hard to be sure you understand exactly what a
 term like this means: *(fun r => smelt (crush r))*.
-It means *a function that, when applied to an actual,
-value, call it *rock*, returns *the result smelting
-the result of crushing r*. But now think of it at a
-higher level of abstraction. It just turns rock into
+It means *a function that, when applied to an actual
+value, call it *r*, returns *the result smelting the
+result of crushing r*.
+
+But now think of it more abstractly as just
+*smelt after crush*, or in standard mathematical
+notation, *smelt ∘ crush*. It just turns rock into
 metal, and you can forget about how it works on the
-inside.
+inside. Heck, just call it *produce!*
 @@@ -/
