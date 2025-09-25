@@ -75,7 +75,7 @@ how to *use* a disjunction.
 ````
 
 
-### Or.elim (Elimination By Case Analysis)
+### Or.elim (By Case Analysis)
 
 ````
 Γ ⊢ h : P ∨ Q   Γ ⊢ f : P → R   Γ ⊢ g : Q → R
