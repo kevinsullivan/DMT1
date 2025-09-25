@@ -387,11 +387,6 @@ respectively.
 def ifThenElsePoly {α : Type} (b : Bool) (x y : α) : α :=
   if b then x else y
 
-<<<<<<< HEAD
-#eval ifThenElsePoly true "Hello" "Goodbye"
-#eval ifThenElsePoly false 5 4
-#eval ifThenElsePoly true true false
-=======
 def fBool' (α : Type) := α → α → α
 
 def fTrue' {α : Type} : α → α → α
@@ -407,7 +402,6 @@ def ifThenElse' {α : Type} : (fBool' α) → α → α → α
 #eval ifThenElse' fTrue' "Hi" "Bye"
 #eval ifThenElse' fFalse' "Hi" "Bye"
 
->>>>>>> 2eded7dce58b892132799c248d8033431e27ce12
 
 /- @@@
 ## Closing thought
