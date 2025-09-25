@@ -15,14 +15,15 @@ namespace OrInference
 /- @@@
 ## Example: Fire ∨ Flood
 
-Now imagine as ystem with two buttons and
-an alarm. Pressing **either** button should
-trigger the alarm.
+Now imagine as ystem with two emergency
+conditions and an alarm. **Either** condition
+should trigger the alarm.
 
 We can formalize this scenario by defining
-three propositions, say `Fire`, `Flood`,
-and `Alarm`, where their being true corresponds
-to the respective conditions being on/pushed.
+three propositions, we'll call `Fire`, `Flood`,
+and `Alarm` We'll stipulate that their being
+true corresponds to the respective conditions
+being present.
 @@@ -/
 
 /-- Propositions -/
@@ -32,10 +33,9 @@ axiom Alarm   : Prop    -- true means alarm sounding
 
 /- @@@
 Now we can formally model the overall system
-behavior of "either button triggers the alarm"
-using the *Or* connective: `Fire ∨ Flood`.
-We'll see how to *build* a disjunction and how
-to *use* one to reason about the system.
+behavior as `(Fire ∨ Flood) → Alarm`. This is
+just  the form of proposition proven by the
+Or.introduction inference rule.
 @@@ -/
 
 
@@ -54,7 +54,7 @@ axiom Q : Prop
 #check P ∨ Q
 
 /- @@@
-## Inference Rules for `∨`
+## Inference Rules
 
 *Or* has **two introduction rules** (left and right)
 and **one elimination rule**. The introduction rules
@@ -75,7 +75,7 @@ how to *use* a disjunction.
 ````
 
 
-### Or.elim (By Case Analysis)
+### Or.elim (By Cases)
 
 ````
 Γ ⊢ h : P ∨ Q   Γ ⊢ f : P → R   Γ ⊢ g : Q → R
@@ -132,12 +132,6 @@ the possible cases for a proof of P ∨ Q and show that
 in either case R follows.)
 @@@ -/
 
-theorem elim'
-  (P Q R : Prop)
-  (h : P ∨ Q)         -- given a proof of P ∨ Q
-  (f : P → R)         -- and a proof of P → R
-  (g : Q → R) : R :=       -- and a proof of Q → R
-    Or.elim h f g  -- conclude R by Iff.elim
 
 example (x : Nat) : x = 4 ∨ x = 2 → x % 2 = 0 :=
   fun (h : x = 4 ∨ x = 2) =>
@@ -159,22 +153,26 @@ true (by *h*), it must be that x%2=0.
 @@@ -/
 
 /- @@@
-## Theorems: A Few Properties of ∨
+## Theorems:
 
-From these rules we can derive useful properties:
-commutativity (P ∨ Q implies Q ∨ P), associativity,
-and identities with `False` and `True`. We'll prove
-a couple explicitly; Lean's library provides many
-others as `Or.comm`, `Or.assoc`, etc.
+From these rules we can derive useful properties.
+
+### ∧ is Commutative
 @@@ -/
 
--- Commutativity: from P ∨ Q derive Q ∨ P
+-- Commutativity: P ∨ Q ↔ Q ∨ P
 theorem comm {P Q : Prop} (h : P ∨ Q) : Q ∨ P :=
   Or.elim h
     (fun p => Or.inr p)
     (fun q => Or.inl q)
 
--- Left identity with False: False ∨ P implies P
+-- EXERCISE: Render this proof in natural language
+
+/- @@@
+### False is a Left Identity for ∨
+@@@ -/
+
+-- Left identity with False: (False ∨ P) →  P
 theorem false_or_left {P : Prop} (h : False ∨ P) : P :=
   Or.elim h
     (fun f => False.elim f)
@@ -188,11 +186,11 @@ and together these yield False ∨ P ↔ P (exercise).
 /- @@@
 ### Case-Analysis in the Example World
 
-Back to our buttons: from `Fire ∨ Flood` we can
+Back to our emergencies: from `Fire ∨ Flood` we can
 deduce `Alarm` by case analysis with the system laws.
 @@@ -/
 
-theorem either_button_triggers_alarm
+theorem either_emergency_triggers_alarm
   (h : Fire ∨ Flood) (fireToAlarm : Fire → Alarm) (floodToAlarm : Flood → Alarm): Alarm :=
   Or.elim h fireToAlarm floodToAlarm
 
@@ -284,7 +282,7 @@ Some derived theorems (deductions from axioms):
 
 - comm : (P ∨ Q) → (Q ∨ P)
 - false_or_left : (False ∨ P) → P
-- either_button_triggers_alarm : (Fire ∨ Flood) → Alarm
+- either_emergency_triggers_alarm : (Fire ∨ Flood) → Alarm
 - (many more in Lean’s library: `Or.comm`, `Or.assoc`, etc.)
 @@@ -/
 
