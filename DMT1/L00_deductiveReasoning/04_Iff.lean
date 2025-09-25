@@ -102,11 +102,12 @@ a pair and return and then apply the left and
 right component proofs. For now, here's the
 introduction rule in inference rule notation.
 
-```text
+
 Γ ⊢ h₁ : P → Q      Γ ⊢ h₂ : Q → P
 ----------------------------------- ↔-intro
   Γ ⊢ (Iff.intro h₁ h₂⟩ : P ↔ Q
-```
+
+
 In these inference rule presentations, the
 capital Greek letter, gamma, Γ, stands for
 *any context of assumptions*. So the overall
@@ -152,9 +153,11 @@ this type, and a function as a proof of Q → P.
 Here's the *left* elimination rule, called
 Iff.mp (for modus ponens).
 
+
 Γ ⊢ h : P ↔ Q      Γ ⊢ p : P
 ----------------------------- ↔-mp
         Γ ⊢ (h.mp) p : Q
+
 
 Note: *h.mp* is notation for *Iff.mp h*.
 
@@ -170,9 +173,13 @@ in the other direction.
 
 
 -- Elimination (right-to-left)
+
+
 Γ ⊢ h : P ↔ Q      Γ ⊢ q : Q
 ----------------------------- ↔-right
         Γ ⊢ h.mpr q : P
+
+
 @@@ -/
 
 def mp (P Q : Prop) (h : P ↔ Q) (p : P) : Q := (h.mp p)
@@ -206,9 +213,12 @@ must be that P is true. Thus P → P is true. And so
 P ↔ P must be true too, proved by applying Iff.intro
 to two copies of a proof of P → P.
 
+
   (no hypotheses)
 --------------------- ↔-refl
 Γ ⊢ ⟨id, id⟩ : P ↔ P
+
+
 @@@ -/
 
 theorem refl (P : Prop) : P ↔ P :=
@@ -227,9 +237,11 @@ in that whenever a = b it must be that b = a, too.
 
 Here's the inference rule statement of the theorem.
 
+
   Γ ⊢ h : P ↔ Q
 ----------------------------- ↔-symm
 Γ ⊢ ⟨h.mpr, h.mp⟩ : Q ↔ P
+
 
 In Lean this is Iff.symm h
 
@@ -245,9 +257,11 @@ terms! *h₂.mp* ∘ *h₁.mp* and *h₁.mpr* ∘ *h₂.mpr*.
 Hint: look at and glue together the types of these
 terms.
 
+
 Γ ⊢ h₁ : P ↔ Q      Γ ⊢ h₂ : Q ↔ R
 ------------------------------------ ↔-trans
 Γ ⊢ ⟨h₂.mp ∘ h₁.mp, h₁.mpr ∘ h₂.mpr⟩ : P ↔ R
+
 
 In Lean the result is Iff.trans h₁ h₂.
 @@@ -/
