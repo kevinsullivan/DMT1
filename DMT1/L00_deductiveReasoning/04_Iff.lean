@@ -12,7 +12,6 @@ equivalence, if and only if, or *iff*.
 
 namespace IffInference
 
-
 /- @@@
 ## Example: Light ↔ Power
 
@@ -64,7 +63,6 @@ assume proofs that both implications are true.
 axiom toPower : Light → Power
 axiom toLight : Power → Light
 
-
 /- @@@
 Now we can formally model the overall system
 behavior with the proposition that both of these
@@ -76,7 +74,6 @@ of implications but is not an equivalence. The
 ↔ connective fixes in that (P ↔ Q) conjoins the
 proposition P → Q with and only with its converse,
 Q → P.
-
 @@@ -/
 
 
@@ -99,14 +96,18 @@ elimination rules. It's like *And* in this
 way. The introduction rule takes two proofs
 and pairs them up. The elimination rules take
 a pair and return and then apply the left and
-right component proofs. For now, here's the
-introduction rule in inference rule notation.
+right component proofs.
 
+### Iff.intro
 
+For now, here's the introduction rule in
+inference rule notation.
+
+````
 Γ ⊢ h₁ : P → Q      Γ ⊢ h₂ : Q → P
 ----------------------------------- ↔-intro
   Γ ⊢ (Iff.intro h₁ h₂⟩ : P ↔ Q
-
+````
 
 In these inference rule presentations, the
 capital Greek letter, gamma, Γ, stands for
@@ -150,14 +151,16 @@ sense as a proof (h : P ↔ Q) comprises both a
 proof of P → Q in the form of a *function* of
 this type, and a function as a proof of Q → P.
 
+### Iff.mp (left elimination)
+
 Here's the *left* elimination rule, called
 Iff.mp (for modus ponens).
 
-
+````
 Γ ⊢ h : P ↔ Q      Γ ⊢ p : P
 ----------------------------- ↔-mp
         Γ ⊢ (h.mp) p : Q
-
+````
 
 Note: *h.mp* is notation for *Iff.mp h*.
 
@@ -167,6 +170,8 @@ then again in that same context, the application
 of Iff.mp to h (with notation h.mp) constitutes
 a proof of Q.
 
+### Iff.mpr (right elimination)
+
 The *right* elimination rule, *mpr*, short for
 *modus ponens right* does the same thing but
 in the other direction.
@@ -174,12 +179,11 @@ in the other direction.
 
 -- Elimination (right-to-left)
 
-
+````
 Γ ⊢ h : P ↔ Q      Γ ⊢ q : Q
 ----------------------------- ↔-right
         Γ ⊢ h.mpr q : P
-
-
+````
 @@@ -/
 
 def mp (P Q : Prop) (h : P ↔ Q) (p : P) : Q := (h.mp p)
@@ -187,7 +191,7 @@ def mpr (P Q : Prop) (h : P ↔ Q) (q : Q) : P := (h.mpr q)
 
 
 /- @@@
-## Theorems
+## Theorems: Some Properties of ↔
 
 From just these three axioms of ↔ we can deduce
 that ↔ must be reflexive, symmtric, and transitive.
@@ -213,11 +217,11 @@ must be that P is true. Thus P → P is true. And so
 P ↔ P must be true too, proved by applying Iff.intro
 to two copies of a proof of P → P.
 
-
+````
   (no hypotheses)
 --------------------- ↔-refl
 Γ ⊢ ⟨id, id⟩ : P ↔ P
-
+````
 
 @@@ -/
 
@@ -237,11 +241,11 @@ in that whenever a = b it must be that b = a, too.
 
 Here's the inference rule statement of the theorem.
 
-
+````
   Γ ⊢ h : P ↔ Q
 ----------------------------- ↔-symm
 Γ ⊢ ⟨h.mpr, h.mp⟩ : Q ↔ P
-
+````
 
 In Lean this is Iff.symm h
 
@@ -257,11 +261,11 @@ terms! *h₂.mp* ∘ *h₁.mp* and *h₁.mpr* ∘ *h₂.mpr*.
 Hint: look at and glue together the types of these
 terms.
 
-
+````
 Γ ⊢ h₁ : P ↔ Q      Γ ⊢ h₂ : Q ↔ R
 ------------------------------------ ↔-trans
 Γ ⊢ ⟨h₂.mp ∘ h₁.mp, h₁.mpr ∘ h₂.mpr⟩ : P ↔ R
-
+````
 
 In Lean the result is Iff.trans h₁ h₂.
 @@@ -/
@@ -294,7 +298,7 @@ confirm that it's a proof of (of type) Z.
 
 
 /- @@@
-## Example: Power ↔ Light
+## Example: Light ↔ Power
 
 Finally, here are a few applications of these
 generalized reasoning principles to the domain
@@ -345,7 +349,5 @@ Theorems (deductoins from axioms)
 - Iff.symm : (P ↔ Q) → (Q ↔ P)
 - Iff.trans : (P ↔ Q) → (Q ↔ R) → (P ↔ R)
 @@@ -/
-
-
 
 end IffInference
