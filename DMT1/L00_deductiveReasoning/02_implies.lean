@@ -243,13 +243,6 @@ theorem trans' {P Q R : Prop} :
   (P → Q) → (Q → R) → (P → R) :=
   fun pq qr => fun p => qr (pq p)
 
--- Best: trans proof is function composition!
-theorem trans''
-  {P Q R : Prop}        -- any propositions
-  (h₁ : P → Q)          -- if P → Q has proof h₁
-  (h₂ : Q → R) :        -- and Q → R has proof h₂
-  (P → R) := h₂ ∘ h₁    -- then h₂ ∘ h₁ proves P → R
-
 /- @@@
 Here are examples applying the *theorem*. The
 theorem itself is a function here, and one that

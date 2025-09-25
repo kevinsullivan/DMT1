@@ -1,6 +1,8 @@
 /- @@@
 # Help on Function Composition
 
+<!-- toc -->
+
 This file is meant to provide helpful concrete
 examples of how all the abstract material we're
 covering might be used in real world analysis.
@@ -69,7 +71,7 @@ defined as the specific function *(smelt ∘ crush).*
 
 
 /- @@@
-## World Mining: Formal Model and Theorems
+## World Mining: Formal (Math-Logic) Model
 
 To enable machine checkable deductive reasoning
 about this world, we need to choose formal terms
@@ -146,6 +148,7 @@ as *the function, smelt after crush*.
 @@@ -/
 
 axiom rock : Rock
+
 #check produce                    rock -- Metal!
 #check (smelt ∘ crush)            rock -- Metal!
 #check (fun r => smelt (crush r)) rock -- Metal!
@@ -162,4 +165,45 @@ But now think of it more abstractly as just
 notation, *smelt ∘ crush*. It just turns rock into
 metal, and you can forget about how it works on the
 inside. Heck, just call it *produce*.
+@@@ -/
+
+/- @@@
+## Transitivity of Implication
+
+Look at the following statement and proof
+of the transitivity of implication. Recall
+that means that it's always the case that if
+A → B and B → C then A → C. Transitivity.
+
+But why is it true? It's true because: (1)
+a proof of *A → B* is a function *(h₁ : A → B)*
+ready to convert any proof of A into a proof
+of B; (2) a proof of *B → C* is similarly a
+function *(h₂ : B → C)*. And the key idea is
+that these functions compose! h₂ ∘ h₁ is a
+function of type *A → C*, and a proof of it.
+
+Here's a formal expression of this idea. Be
+focused on being able to explain confidently
+why that function composition work where it is.
+@@@ -/
+
+theorem trans
+  {P Q R : Prop}        -- if we have propositions
+  (h₁ : P → Q)          -- and if P → Q has proof h₁
+  (h₂ : Q → R) :        -- and if Q → R has proof h₂
+  (P → R) := h₂ ∘ h₁    -- then h₂ ∘ h₁ proves P → R
+
+/- @@@
+
+You could even say that implication
+is transitive because the functions that
+prove the premises always compose into
+functions that prove the conclusion
+(here P → R).
+
+Under the Curry Howard Correspondence,
+the transitivity of logical implication
+corresponds to (and is indeed proven by)
+composition of functions.
 @@@ -/
