@@ -87,6 +87,8 @@ concepts of Rock (big rocks), Ore (crushed down),
 and (smelted) Metal.
 @@@ -/
 
+namespace DMT1.compositionHelp
+
 axiom Rock : Type   -- type for uncrushed rocks
 axiom Ore : Type    -- type for crushed coarse ore
 axiom Metal : Type  -- type for refined metal
@@ -168,7 +170,8 @@ inside. Heck, just call it *produce*.
 @@@ -/
 
 /- @@@
-## Transitivity of Implication
+
+##  ∘ Proves the Transitivity of →
 
 Look at the following statement and proof
 of the transitivity of implication. Recall
@@ -186,6 +189,8 @@ function of type *A → C*, and a proof of it.
 Here's a formal expression of this idea. Be
 focused on being able to explain confidently
 why that function composition work where it is.
+You can see earlier version of this definition
+in the Implication section.
 @@@ -/
 
 theorem trans
@@ -202,8 +207,35 @@ prove the premises always compose into
 functions that prove the conclusion
 (here P → R).
 
-Under the Curry Howard Correspondence,
-the transitivity of logical implication
-corresponds to (and is indeed proven by)
-composition of functions.
+## Curry Howard Correspondence
+
+This proof of the transitivity of logical
+implication is in fact identical to that for
+composing functions but one is logical and
+operates on proofs in Prop, while the other
+is computational and operates on ordinary
+functions.
 @@@ -/
+
+def compose
+  {P Q R : Type}        -- if we have these types
+  (h₁ : P → Q)          -- and h₁ takes P and returns Q
+  (h₂ : Q → R) :        -- and h₂ takes Q and returns R
+  (P → R) := h₂ ∘ h₁    -- h₁ ∘ h₂ takes P and returns R
+
+/- @@@
+Compare and constrast these two definitions. They're
+nearluu identical: Curry Howard twins! One *reasons* by
+inference, from the assumptions before the colon to the
+conclusion after. The other computes by beta reduction,
+given actual parameters as specific before the colon and
+returning a result of the type after (here a function).
+
+To model World Mining, LLC, we've used computational
+data types and functions, and function composition (not
+transitivity of implication) to describe the system's
+overall input-to-output transformation as a composition
+of two more elementary functions.
+@@@ -/
+
+end DMT1.compositionHelp
