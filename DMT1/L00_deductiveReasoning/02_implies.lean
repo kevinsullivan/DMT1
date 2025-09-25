@@ -156,7 +156,14 @@ axiom rain : Rain               -- proof it's raining
 #check wetSlippy (rainWet rain) -- proof it's slippy!
 
 /- @@@
-### Great Theorems are Generalizations
+## Theorems as Generalizations
+
+A theorem is a nothing but a proved/true propostition,
+but a great theorem is general in the sense that it is
+general, in the sense that it's paramaterized and thus
+applies to many different objects of the same type. We
+will see this principle now in a simple example.
+
 In general, if A causes B, and also B causes C, then it
 must be the case that A cases C. In logical notation we
 can write *∀ (A B C : Prop), (A → B) → (B → C) → (A → C)*.
@@ -193,7 +200,7 @@ theorem impTrans' {P Q R : Prop} :    -- P, R, R are props
     fun pq qr => fun p => qr (pq p)   -- proof of it
 
 /- @@@
-## Applying Theorems
+## Elimination is Specialization
 
 Now we're at an interesting place. *impTrans* proves
 an implication. So it must be a function. So we must
