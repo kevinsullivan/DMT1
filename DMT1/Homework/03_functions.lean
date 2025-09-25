@@ -28,7 +28,7 @@ squared.
 @@@ -/
 
 def square : Nat → Nat :=
-  sorry
+  λ (x : Nat) => x^2
 
 /- @@@
 #1 [5 points].
@@ -99,7 +99,7 @@ Your job is to define the function, call
 it *prAdd*, short for *partially reduced
 add*, that is equivalent to the result of
 performing one β reduction to the term,
-*add 2 3*. Use the same function definiton
+*add 2 3*. Use the same function definition
 syntax that we've used to define *add*.
 @@@ -/
 
@@ -117,7 +117,7 @@ replacing the *sorry* with your answer.
 def M : Nat → Nat → Nat := fun x y => x * y
 
 def M' : Nat → Nat :=
-  sorry
+  fun y => M 2 y
 
 /- @@@
 #6 [10 points].
@@ -140,13 +140,7 @@ if *f* is natural number multiplication, then the value
 should be 2 * 3 = 6.
 
 - define *apply* (put function type expressions in parens)
-- next test that the applicatiuon, *apply add 2 3,* returns 5
-@@@ -/
-
-
-/- @@@
-#7 [10 points].
-
+- next test that the application, *apply add 2 3,* returns 5
 Use #eval to the application, *apply (_) 2 3*, where _ is
 replaced with a lambda abstraction for Nat multiplication.
 @@@ -/
@@ -268,7 +262,7 @@ each of type Nat, and return *n1*.
 The type of this function as described is
 *Nat → Nat → Nat*. Be sure you see that before
 going on.  However, we're going to use this
-function, and a corresponding *fFalse* verison,
+function, and a corresponding *fFalse* version,
 to *represent* Boolean values in the lambda
 calculus, so we're going to define a new type,
 in Lean, called fBool, as *Nat → Nat → Nat*.
@@ -390,7 +384,12 @@ respectively.
 @@@ -/
 
 -- Answer here
+def ifThenElsePoly {α : Type} (b : Bool) (x y : α) : α :=
+  if b then x else y
 
+#eval ifThenElsePoly true "Hello" "Goodbye"
+#eval ifThenElsePoly false 5 4
+#eval ifThenElsePoly true true false
 
 /- @@@
 ## Closing thought
