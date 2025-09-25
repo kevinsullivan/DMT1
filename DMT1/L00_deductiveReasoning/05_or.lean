@@ -13,27 +13,27 @@ logical *or*, or simply *Or*.
 namespace OrInference
 
 /- @@@
-## Example: ButtonA ∨ ButtonB
+## Example: Fire ∨ Flood
 
 Now imagine as ystem with two buttons and
 an alarm. Pressing **either** button should
 trigger the alarm.
 
 We can formalize this scenario by defining
-three propositions, say `ButtonA`, `ButtonB`,
+three propositions, say `Fire`, `Flood`,
 and `Alarm`, where their being true corresponds
 to the respective conditions being on/pushed.
 @@@ -/
 
 /-- Propositions -/
-axiom ButtonA : Prop    -- true means A pressed
-axiom ButtonB : Prop    -- true means B pressed
+axiom Fire : Prop    -- true means A pressed
+axiom Flood : Prop    -- true means B pressed
 axiom Alarm   : Prop    -- true means alarm sounding
 
 /- @@@
 Now we can formally model the overall system
 behavior of "either button triggers the alarm"
-using the *Or* connective: `ButtonA ∨ ButtonB`.
+using the *Or* connective: `Fire ∨ Flood`.
 We'll see how to *build* a disjunction and how
 to *use* one to reason about the system.
 @@@ -/
@@ -67,11 +67,11 @@ how to *use* a disjunction.
 ````
     Γ ⊢ p : P
 --------------------- ∨-intro-left
-Γ ⊢ Or.inl p : P ∨ Q
+Γ ⊢ (Or.inl p) : P ∨ Q
 
     Γ ⊢ q : Q
 --------------------- ∨-intro-right
-Γ ⊢ Or.inr q : P ∨ Q
+Γ ⊢ (Or.inr q) : P ∨ Q
 ````
 
 
@@ -80,9 +80,8 @@ how to *use* a disjunction.
 ````
 Γ ⊢ h : P ∨ Q   Γ ⊢ f : P → R   Γ ⊢ g : Q → R
 ---------------------------------------------- ∨-elim
-      Γ ⊢ Or.elim h f g : R
+      Γ ⊢ (Or.elim h f g) : R
 ````
-
 
 Intuitively: if from P you can get R, and from Q
 you can get R, then from P ∨ Q you can also get R.
@@ -189,13 +188,53 @@ and together these yield False ∨ P ↔ P (exercise).
 /- @@@
 ### Case-Analysis in the Example World
 
-Back to our buttons: from `ButtonA ∨ ButtonB` we can
+Back to our buttons: from `Fire ∨ Flood` we can
 deduce `Alarm` by case analysis with the system laws.
 @@@ -/
 
 theorem either_button_triggers_alarm
-  (h : ButtonA ∨ ButtonB) (toAlarmA : ButtonA → Alarm) (toAlarmB : ButtonB → Alarm): Alarm :=
-  Or.elim h toAlarmA toAlarmB
+  (h : Fire ∨ Flood) (fireToAlarm : Fire → Alarm) (floodToAlarm : Flood → Alarm): Alarm :=
+  Or.elim h fireToAlarm floodToAlarm
+
+/- @@@
+Now there's another way to write this proof in Lean,
+and that's using pattern matching to destructure *h*
+into either *Or.inl (f : Fire)* or *Or.inr (f : Flood)*.
+@@@ -/
+
+example
+  (h : Fire ∨ Flood)
+  (fireToAlarm : Fire → Alarm)
+  (floodToAlarm : Flood → Alarm)
+: Alarm :=
+  match h with  -- h can only be one of the following
+  | Or.inl f => fireToAlarm f   -- f is proof of fire
+  | Or.inr f => floodToAlarm f  -- f is proof of flood
+
+/- @@@
+The first case in the match shows that from a proof
+of Fire ∨ Flood from a proof of fire we can derive a
+proof Alarm, by applying fireToAlarm to f. There is
+only one more possible way for First ∨ Flood to be
+true, and that's from a proof of flood. In this case
+applying floodToAlarm such a proof of flood would give
+a proof of alarm.
+
+In short, if First ∨ Flood is true *and in either case*
+Alarm is true, then Alarm is true. This is how one uses
+a proof of a disjunction. You have to show that a proof
+of the goal can be constructed *in either case*.
+@@@ -/
+
+/- @@@
+Finally we'll note that the match construct is notation
+for application of the elimination rule for h, which is
+to say, Or.elim. The two proof arguments are crucial in
+enabling a proof of Alarm to be constructed *in either
+case*, one from a proof of first, and one from a proof
+of Flood.
+@@@ -/
+
 
 /- @@@
 ### Exercises
@@ -245,7 +284,7 @@ Some derived theorems (deductions from axioms):
 
 - comm : (P ∨ Q) → (Q ∨ P)
 - false_or_left : (False ∨ P) → P
-- either_button_triggers_alarm : (ButtonA ∨ ButtonB) → Alarm
+- either_button_triggers_alarm : (Fire ∨ Flood) → Alarm
 - (many more in Lean’s library: `Or.comm`, `Or.assoc`, etc.)
 @@@ -/
 
