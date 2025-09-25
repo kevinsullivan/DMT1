@@ -4,57 +4,73 @@
 This file is meant to provide helpful concrete
 examples of how all the abstract material we're
 covering might be used in real world analysis.
+The focus here is on *composition of functions*.
 
 So let's start with a story. It's about a world.
 
-The process of converting rocks into metal can
-be expressed as a composition of two operations
-involving three types of material. The materials
-are:
+## World Mining Ops, LLC
 
-- *run-of-mine (ROM) ore*, basically large rocks
-- *coarse ore*, the output of the crushing process
-- *metal*, the output of the smelting process
+World Mining Ops, LLC is in the business of
+converting rocks into metal. Their secret sauce
+is their modular implementation architecture.
+Unlike their competitors, they first crush rock
+before smelting out the metal. They implement
+*Rock → Metal*  as a composition of two smaller
+operations: smelting after first crushing rock.
 
-The *crush* function turns *run-of-mine* (ROM)
-ore (large rocks) into crushed (*coarse ore*).
-The *smelt* function uses coarse ore to finally
-produce refined *metal*.
+If you read about *run-of-mine (ROM) ore*, it
+is rocks before any crushing. Crushing produces
+*coarse ore*. From coarse ore, *smelting* then
+derives *metal*. We'll just call the materials
+Rock, Ore, and Metal.
 
-The overall process of turning rock into metal,
-itself a function of type Rock → Metal, is then
-obtained by piping, or connecting, the output of
-crush to the input of smelt. One might imagine a
-huge conveyor belt coming out of the *crush* unit
-and then going right back into the *smelt* op.
+The overall process of turning rock into metal
+modeled as a function has type Rock → Metal. It
+is this function that actually characterizes the
+overall operation: *from Rock derive Metal*. The
+overall operation, viewed as a function, is thus
+of type Rock → Metal.
 
-Gluing the two functions together into a bigger
-overall function that works by applying the
-second function to the result of apply the first
-function to an argument of that first function's
-input type. The result type is the result type of
-the second function. This way of composing two
-compatible functions into a new one is called
-*function composition*.
+Of course that's what everyone is trying to do.
+What's interesting is how World Mining structures
+its implementation: again as a composition of two
+functions, in this case each specialized to carry
+out a particular subtask, and where the output of
+the first function is passed as an input to the
+second function to compute the final result.
+
+Here, if given rock, we can apply *crush* to get
+*ore*, then apply *smelt* to that to get *metal.*
+In this metaphor, you can think of composition
+as connecting two previously separate functions
+into one by connecting the output of the first,
+on a conveyor belt, to the input of the second.
+From *crush* output ore, *smelt* derives metal.
+
+- (second ∘ first) rock = second (first rock)
+- (second ∘ first) = fun rock => second (first rock)
+
+Gluing the two functions together into one in
+this way leaves the first function's input ready
+to receive. It's output and second's input are
+now wired together and can be forgotten. And the
+output is that of the second stage processing the
+output of the first stage.
 
 So, having connected the output of *crush* to the
-input of *smelt* we get larger function taking
-*crush* inputs (Rock) and producing *smelter*
-outputs (Metal). Let's call it *produce*. It's
-a function of type *Rock → Metal*, which really
-reflects the whole purpose of a mining operation.
-(IRL there's also *Metal → Money,* of course.)
+input of *smelt* we get an overall function taking
+*crush* inputs (Rock), doing something inside the
+black box, and producing *smelter* outputs (Metal).
+On the whole, the operation has type Rock → Metal.
 
-We hadn't recognized *produce* as an important
-concept earlier in this initial story, but our
-logical analysis made it clear as an important
-concept *in the world* of mining. The purpose
-and essential overall behavior of an operation
-like ours is to turn rock to metal (ok, and $).
+Let's call the function, *produce : Rock → Metal*,
+defined as the specific function *(smelt ∘ crush).*
 @@@ -/
 
 
 /- @@@
+## World Mining: Formal Model and Theorems
+
 To enable machine checkable deductive reasoning
 about this world, we need to choose formal terms
 in our logic to represent things and connections
@@ -145,5 +161,5 @@ But now think of it more abstractly as just
 *smelt after crush*, or in standard mathematical
 notation, *smelt ∘ crush*. It just turns rock into
 metal, and you can forget about how it works on the
-inside. Heck, just call it *produce!*
+inside. Heck, just call it *produce*.
 @@@ -/
