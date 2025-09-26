@@ -202,7 +202,7 @@ P is true then Q must be true as well.
 @@@ -/
 
 /- @@@
-## Partial Evaluation and Associativity
+## Partial Evaluation
 
 Two key facts:
 - the → type builder is right-associative
