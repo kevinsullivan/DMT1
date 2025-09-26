@@ -194,7 +194,7 @@ let f := String.length        -- f : String → Nat
 let s := "I love reasoning"   -- s : String
 (f s)                         -- (f s) : Nat
 
-/- @@@
+/- @@@`
 This is the computational analog of the
 inference rule of Aristotle that came be
 known as modus ponens: if P implies Q and
@@ -202,7 +202,7 @@ P is true then Q must be true as well.
 @@@ -/
 
 /- @@@
-# Partial Evaluation and Associativity
+## Partial Evaluation and Associativity
 
 Two key facts:
 - the → type builder is right-associative
