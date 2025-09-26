@@ -1,272 +1,297 @@
 /- @@@
+This file explains functions, by which we will mean
+individual function values of given function types.
+It might be a bit of a surprise but we can define how
+functions work by specifying their introduction and
+elimination rules: what it takes and how to form them,
+and how, once formed, they can be used.
+@@@ -/
+
+/- @@@
 # Functions
 
 <!-- toc -->
-
 @@@ -/
 
 /- @@@
-## Introduction
+## Preliminary: Notation Alternatives
 
-The way you *introduce* a new function definition
-into your environment, of type S → T, where S and T
-are any types, is you provide a lambda abstraction
-of this type. What *(f : S → T)* proves is that *if*
-an *(s : S)* is provided then a value of type *T* can
-be derived, namely *(f s : T)*. A lambda abstraction
-is, again, a term such as *fun (n : Nat) => n + 1*
-that specifies how total function transforms values
-of its argument type into values of its return type.
+Lean provides several notations for defining named
+functions. Here are variants for the same function:
+take in two Nats, n1 and n1; return/produce n1 + n2.
 @@@ -/
 
-def increment : Nat → Nat := fun n => n + 1
-#eval increment 0
+-- Option #1
+def myAdd : Nat → Nat → Nat :=
+fun (n1 n2 : Nat) => n1 + n2
 
--- Let's break that down further
+/- @@@
+Here it is broken down.
 
-def               -- keyword in Lean
-  increment'        -- name' bound to term
-  :                 -- read as "of type"
-  Nat → Nat         -- a function type
-  :=                -- separates type, value
-    fun             -- a function with
-    n               -- formal parameter n
-    =>              -- returning the value
-    n + 1           -- n + 1
+````
+- def         bind
+- myAdd       name
+- ℕ → ℕ → ℕ   to a value of this type
+- :-          and specifically to
+- fun (n1 n2 : Nat) => n1 + n2
+- where
+  - fun             starts λ abstraction term
+  - (n1 n2 : Nat)   assumes and names two Nat arguments
+  - =>              and from theM derives and returns
+  - n1 + n2         the result of evaluating this expression
+````
+
+With the definition accepted, you can now
+ue the name *myAdd* whenever you want to
+apply your addition function. Let's see it go.
+@@@ -/
+
+#eval myAdd 3 4
 
 
 /- @@@
-## Function Definition Notation Alternatives
-Lean provides several different notations
-for defining named functions. Here we run
-through them using the preceding function as
-an example.
+To avoid name conflicts we add a ' to myAdd.
+The difference here is that we've assumed and
+bound names to the arguments before the colon.
+These names then work throughout the definition.
+This syntax is very much in the style of Java,
+C++, etc. But its meaning is exactly *myAdd*.
 @@@ -/
-
-
--- a "binary" (two-Nat-argument) function
-def myAdd : Nat → Nat → Nat  :=
-  -- left side binds names to arguments for use on right side
-  -- we can also say "let n1 and n2 be arbutrary Nat"
-  fun (n1 n2 : Nat) => n1 + n2
-
-  #eval myAdd 3 4
-
---
-def myAdd'' (n1 n2 : Nat) : Nat :=
+def myAdd' (n1 n2 : Nat) : Nat :=
   n1 + n2
 
--- Lean argument pattern-matching notation (often preferred)
-def myAdd' :  Nat → Nat → Nat
+/- @@@
+We can call this syntax the *case analysis* style.
+We'll explain it in more depth later, but for now
+you (1) omit :=, (2) write | (3) bind names to
+assumed incoming arguments, (4) then return the
+result of evaluating the expresson on the right.
+@@@ -/
+def myAdd'' : Nat → Nat → Nat
 | n1, n2 => n1 + n2
 
-def myAdd''' : (n1 : Nat) → (n2 : Nat) → Nat  :=
-  fun n1 n2 => n1 + n2
-
-
-
 /- @@@
-## Elimination: By *Application* to an Argument
-
-The way that you *use* a function definition is to
-*apply* it to an argument of the specified type. So,
-if, for example, $f : S → T$ is a (total) function
-and (s : S) then ((f s) : T).
-
-Here's the elimination inference rule writen in the
-formal style you'd see in a textbook or research
-paper. Assumptions (arguments) are above the line;
-the conclusion is below the line; and a shortened
-name for the rule is to the right of the line.
-
-
-```lean
-(f : S → T) (s : S)
--------------------- →-elim
-    (f s : T)
-```
-
-For short rules, they can also be written inline
-using a turnstile character instead of the line,
-like this: *(f : S → T) (s : S) ⊢ (f s : T)*.
-
-Computationally this rule states that if you have
-a (total) function, f, that takes S-type values in
-and returns T values, and you also have an S-value,
-s, then the type of value obtained by applying f to
-s is just T.
-
-```lean
-(String.length : String → Nat) (s : String)
--------------------------------------------
-          (String.length s : Nat)
-```
+This variant shows how names can be given to
+values in function type expression. However,
+these bindings are observed only within that
+overall function type expressions. The real
+use case id for polymorhic functions, which
+is to say, functions that take Type values
+as arguments, and then other values of those
+types.
 @@@ -/
 
+def myAdd''' : (n1 : Nat) → (n2 : Nat) → Nat :=
+  fun n1 n2 => n1 + n2
+-- n1 + n2 will not work here, names not bound here
+
+/- @@@
+Here we have to name the type argument (we
+name it α), so that we can speficy the rest
+of the function type. This is the function
+that takes any value, (a : α) of any type,
+{ α : Type }, as input and that always then
+retuns some value of type α. There is one
+and only one way to finish the definition:
+return *a* itself. We have nothing to work
+with to get a handle on any other value of
+type α.
+@@@ -/
+
+def idFun : {α : Type} → α → α := λ a => a
+
+/- @@@
+As a variant to the firt approach above,
+we can use an argument-free, template-like
+notation,
+@@@ -/
+
+def myAdd_pf : Nat → Nat → Nat := (· + ·)
+
+/- @@@
+The unnamed dot placeholders get bound in
+turn to the incoming two argument values.
+Evaluating that term gives the final result.
+@@@ -/
+
+#eval myAdd_pf 3 4
+
+/- @@@
+## Inference Rules for Functions (→)
+
+### Introduction
+We can specified a particular function
+of the general type S → T by giving a
+lambda abstraction that specified just
+how it transforms input to out values.
+In plain english, function introduction
+is by giving a lambda abstraction of the
+specified function type. Of course any
+of the notational shorthands would do.
+@@@ -/
+
+def n2n : Nat → Nat := fun n => n + 1
+
+/- @@@
+````
+def             -- keyword to bind name
+n2n             -- the name to be bound
+:               -- to any value of type
+Nat → Nat       -- Nat arg to Nat result
+:=              -- namely *this* function
+fun n => n + 1  -- applied to n, yield n+1
+````
+@@@ -/
+
+/- @@@
+### → Elimination
+
+The elimination rule for functions, the
+rule that defines how you use a function,
+is *apply them*. It's nodus ponens, now for
+computation, not just formal reasoning. As
+an exanple, the way to use *n2n*, as just
+defined, is to apply it to any value of its
+argument type, Nat, to obtain a Nat result.
+@@@ -/
+
+#check (n2n 0)
+
+def s2n (s : String) : Nat := s.length
+#check (s2n)        -- String → Nat
+#check s2n "Hello"  -- Nat
+#eval s2n "Hello"   -- 5, by computation
+
+/- @@@
+## Formal Inference Rules
+
+The rules for → capture the intended meaning.
+
+-- Introduction (→.intro): exhibit a lambda
+
+````
+Γ ⊢ (fun (s : S) => (t : T)) : S → T
+------------------------------------ →.intro
+            Γ ⊢  S → T
+````
+
+-- Elimination / Modus Ponens (→.elim)
+
+````
+Γ ⊢ f : S → T      Γ ⊢ s : S
+-------------------------------- →.elim
+            Γ ⊢ f s : T
+````
+
+If in any context Γ, you have a function, f,
+from S → T, and a value s of type S, then the
+application of f to s reduces to (is) a value
+of type T.
+@@@ -/
 
 #check
-  let f := String.length
-  let s := "I love reasoning"
-  (f s)
+let f := String.length        -- f : String → Nat
+let s := "I love reasoning"   -- s : String
+(f s)                         -- (f s) : Nat
 
 /- @@@
-This is just the computational analog of the
-rule of *deductive* reasoning that Aristotle
-called *modus ponens.* Example: If whenever it
-has rained the streets are wet (R → W), and if
-it has rained (R), then the streets are wet.
-
-## Functions with Multiple Arguments
+This is the computational analog of the
+inference rule of Aristotle that came be
+known as modus ponens: if P implies Q and
+P is true then Q must be true as well.
 @@@ -/
-
--- Application of
-#eval myAdd 1 2
-#eval myAdd' 1 2
-#eval myAdd'' 1 2
-#eval myAdd'' 1 2
-
--- Def value as result of a function application
-
-def n3 : Nat := myAdd 1 2
-#eval n3
 
 /- @@@
-### Partial Evaluation
-But Prof. Sullivan, your example was of a function
-that takes just one parameter, and your add function
-takes two. What's up with that? Prof. Sullivan. Ah,
-cricket. Partial evaluation.
+# Partial Evaluation and Associativity
 
-It's easy to understand partial evaluation if you
-understand the following two facts.
+Two key facts:
+- the → type builder is right-associative
+- function application is left-associative
 
-- Arrow (→) is right associative
-- Application is left associative
-
-### → is Right Associative
-
-What this means is that when types
-are combined into function types by
-→, the → expressions group from the
-right.
-
-To see what this means, let S, T, U,
-and V be arbitrary types.
+This means that S → T → U → V is equivalent
+to S → T → (U → V) and to S → (T → (U → V)).
+This then is the type of function that takes
+a value (s : S) in and that in effect returns
+a function that then takes a (t : T), etc.
 @@@ -/
+
 
 axiom S : Type
 axiom T : Type
-axiom U : Type
+axiom U: Type
 axiom V : Type
 
-/- @@@
-Then S → T → U → V is a type, too.
-@@@ -/
-
-#check S → T → U → V
+#check S → T → U → V -- parses as S → (T → (U → V))
 
 /- @@@
-### Application is Left Associative
-
-The second key idea is that the application of
-a function to arguments is left associative. To
-see what that means, suppose $f$ is a function
-from values of types *S, T,* and *U*, to values
-of type *V*.
+Suppose we have a function of this type
+and arguments of types S, T, and U, to which
+to apply it.
 @@@ -/
 
 axiom f : S → T → U → V
-
-/- @@@
-Furthermore, assume that we have actual values
-of these types, with corresponding lower-case
-names.
-@@@ -/
-
 axiom s : S
 axiom t : T
 axiom u : U
-axiom v : V
-
 
 /- @@@
-Now we can compute a "return result" of type
-*V* by applying the function *f* to the values,
-*s, t,* and *u*, which would be written in Lean
-as *f s t u*. In Python or C it's *f(s, t, u)*.
-Here Lean confirms it's (the result) type is *V*.
+Then we can apply f to the three arguments,
+f, s, and t, to derive a result of type V.
 @@@ -/
 
 #check f s t u
 
 /- @@@
-The question of the associativity of function
-application in such an express is the question,
-where do the parentheses have to go, if one is
-to write them explicitly. Does *f s t u* mean
-*f (s (t u))*, or does it mean *((f s) t) u*.
+This, like any, function application term is
+left associative. That means its implicitly
+grouped from the left. We should get the same
+result from this then:
+@@@ -/
 
-Remind yourself of the type of the function,
-*f : S → T → U → V*, and that → is *right*
-associative, to conclude that type of $f$ with
-parentheses inserted is *f : S → (T → (U → V))*.
-But that means that *f* is really a function of
-one argment, some *(s : S)*, and that returns a
-value of the function type, *T → U → V*.
+#check (((f s) t) u)
 
-We might thus expect to be able to apply *f* to
-just its first argument to obtain a new function
-of type *(T → U → V)*. And indeed that works!
+/- @@@
+First, (f s) evaluates to a function. This function
+then applies to t, yielding a function that applies
+to u, which finally would return some V value.
 @@@ -/
 
 #check f
-#check f s
-#check (f s) t
-#check ((f s) t) u
-#check f s t u
+#check f s -- : T → U → V
+#check (f s) t -- : U → V
+#check ((f s) t) u -- : V
+#check f s t u -- also : V (parentheses implicit)
+
 
 /- @@@
-### Examples using Nat Add (+)
+## Examples
 
-Recall. that *myAdd : Nat → Nat → Nat*
-A typical application of this function
-would be *myAdd 1 4*, reducing to *5*.
-But now we know that if we put all the
-parentheses in explicitly, this is really
-*(myAdd 1) 4*. So let's compute the first
-part, *myAdd 1*, and see just what it is.
-We'll call it, *add1*, and we know now
-that its type will be *Nat → Nat*, taking
-one remaining argument and returning a
-result, both also of type Nat.
-@@@ -/
+### Involving Nats
+
+Recall that myAdd : Nat → Nat → Nat. A application term
+would be something like this: *myAdd 1 4*, The result should
+be 5. With explicit parentheses, this is (myAdd 1) 4. Ok, so
+what is &myAdd 1*? Well it's just like myAdd but wherever the
+first argument name appeared in myAdd it will be replaced with
+a 1, This is thus a function that takes the second argument and
+adds that 1 to it. @@@ -/
 
 def add1 : Nat → Nat := myAdd 1
 #check add1
 #eval add1 2
 #eval add1 5
 
-/- @@@
-Amazing! The *add1* function takes any Nat,
-the second argument and adds 1 to it. We can
-expect *myAdd 10* in turn to be a function that
-takes one argument and adds ten to it.
-@@@ -/
-
+-- add10 is myAdd wired to add 10 to its remaining argument
 def add10 : Nat → Nat := myAdd 10
 #eval add10 5
 #eval add10 10
 
 /- @@@
-### Examples using Bools
+### Involving Bools
 
-We'll define a function, *ifThenElse* taking
-three Boolean arguments and returning a Bool
-value. In particular if the first argument is
-Boolean true, this function returns the second
-argument otherwise it returns the third. Note
-that we also show you here how to write if then
-else statements in Lean.
+Define ifThenElse : Bool → Bool → Bool → Bool: if the first argument is true,
+return the second; otherwise return the third. This also illustrates if … then
+… else … in Lean.
 @@@ -/
 
 def ifThenElse : Bool → Bool → Bool → Bool
@@ -279,11 +304,8 @@ def ifThenElse : Bool → Bool → Bool → Bool
 #eval ifThenElse false false true
 
 /- @@@
-Be sure you understand the types of each of the expressions here.
-Be able to explain what's happening in terms of the associativity
-properties of → and application. We've added explicit parentheses.
-Be clear that the inner expressions are evaluated first and return
-*functions* that then consume the next argument to the right.
+Be sure you understand the types of each of the expressions here. We’ve added
+explicit parentheses to show left-associative application.
 @@@ -/
 
 #check ifThenElse
@@ -291,156 +313,84 @@ Be clear that the inner expressions are evaluated first and return
 #check (ifThenElse false) false
 #check ((ifThenElse false) false) true
 
--- These expressions are equivalent
+-- These expressions are equivalent:
 #eval ((ifThenElse false) false) true
-#eval   ifThenElse false  false  true
-
-/- @@@
-But this one doesn't even make sense (uncomment).
-It's as if you're treating false as a function
-to be applied to the result of applying false to
-true. But false and true are not functions, so it
-all is just nonsense, and Lean catches the error.
-@@@ -/
-
--- #eval ifThenElse (false  (false  true))
+#eval ifThenElse false false true
 
 /- @@@
 ## Type Inference
 
-So far in this class, we've expressed the
-types of most things explicitly. For example,
-we defined *myAdd* of type *Nat → Nat → Nat*
-like this:
-@@@ -/
+We’ve often written types explicitly. For example:
 
 def myAddAgain : Nat → Nat → Nat :=
   fun n1 n2 => n1 + n2
 
-
-/- @@@
-What if we try to elide the function type.
-Uncomment this code to see that it doesn't
-work.
-@@@ -/
+What if we elide the function type? Uncomment to see why this fails:
 
 -- def myAddAgain' :=
 --   fun n1 n2 => n1 + n2
 
-/- @@@
-The problem is that Lean has no way of
-knowing, just from what's written, that
-*n1* and *n2* are meant to be Nat, and
-not, say, Int, or Float, or Matrix. Lean
-defines different versions of *+* for
-many different types of arguments.
+Lean lacks the contexts needed to infer the type. Sometimes
+one has to provide at least one type annotation at which point
+Lean can do the rest. Here are examples.
+  @@@ -/
 
-On the other hand, Lean does know that
-every version of *+* takes two arguments
-of the same type and returns a result of
-that same type.
+def myAddAgain : Nat → Nat → Nat :=
+fun n1 n2 => n1 + n2
 
-So what if we explicitly declared the type
-of just one of these values: one of the
-two arguments or of the return result? As
-we now see. That enough for Lean to deduce
-the type of the function itself.
-@@@ -/
-
+-- annotate the return value
 def newAdd1 := fun n1 n2 => (n1 + n2 : Nat)
-#check (newAdd1)
+#check newAdd1
 
+-- annotate the first argument
 def newAdd2 := fun (n1 : Nat) n2 => n1 + n2
-#check (newAdd2)
+#check newAdd2
 
-def newAdd3 := fun n1 (n2 : Nat)  => n1 + n2
-#check (newAdd3)
+-- annotate the second argument
+def newAdd3 := fun n1 (n2 : Nat) => n1 + n2
+#check newAdd3
 
--- You can elide inferrable return types, too
+-- declare names and the of the arguments
 def newAdd4 (n1 n2 : Nat) := n1 + n2
-#check (newAdd4)
+#check newAdd4
 
 /- @@@
-In sum, you can often elide explicit type
-declarations when writing Lean code. As long
-as Lean's type inference algorithm has enough
-contextual to infer what they must be, you can
-leave them out, for (often) easier to read code.
+Summary: you can often elide type declarations.
+If Lean’s type inference has enough context, it
+can fill in the rest.
 @@@ -/
 
-
 /- @@@
-## Implicit Arguments
+## Implicit Arguments (Polymorphic Identity)
 
-It's also often the case that Lean can infer
-the values of type arguments, which are values
-of type Type or Prop, from other arguments that
-are declared to be of those types. But if Lean
-can figure out the value of type argument from
-a value argument of that type, then you should
-not have to write the type argument explicitly.
-
-Here's an example function, *ident.* It takes
-two arguments. The first, *(α : Type),* could
-be, say, *Nat* or *Bool*. The second argument
-must then be a value of the type bound to α.
-It finally returns the second argument without
-any change.
+Sometimes Lean can infer the values of type arguments (i.e.,
+values of Type) from value arguments. Here’s a monomorphic
+identity function for comparison:
 @@@ -/
 
 def identNat : Nat → Nat
 | n => n
-
-#eval (identNat 5)
+#eval identNat 5
 
 def identBool (b : Bool) := b
-
-#eval (identBool true)
-
-def ident (α : Type) (a : α) := a
+#eval identBool true
 
 /- @@@
-You could even say that, for any type, α,
-*ident* is the identity function on values
-of that type: the function that just returns
-the argument it was given. You could go even
-further and say *ident* is the parametrically
-polymorphic identity function.
-
-So let's look at a few applications. To apply
-it, write its name followed by a value of type
-*Type* (the α argument) and then a value of the
-*type* that you gave as the *value* of α.
+Now a polymorphic function that generalizes from Nat to any type α.
 @@@ -/
+
+def ident (α : Type) (a : α) := a
 
 #eval ident Nat 3
 #eval ident String "I am a string"
 #eval ident Bool false
--- The types better match. Uncomment to see a type error
+-- Uncomment for a type error (type mismatch):
 -- #eval ident String true
 
 /- @@@
-But the astute student will observe that
-in each example, Lean knows the *type* of the
-second argument, and from that can infer that
-the value of the first argument must be that
-type. For example, Lean knows that the second
-argment, $3$, in the first example is of type,
-Nat, and from that it should infer the value
-of the first argument, α, must be *Nat*, as
-no other type would work here.
-
-Okay, so if Lean can always infer the value of
-the first argument from the value of the second,
-why can't I apply *ident* the function without
-having to write the first argument at all?
-
-Well, you can. When you know that Lean should
-be able to infer the value of some argument, you
-can write its declaration inside curly brace. You
-must then *not* provide the argument explicitly
-when applying the function. Implicit arguments
-make for much cleaner code.
+If Lean can infer the type argument from the value argument,
+ we can make the type argument implicit by enclosing it with
+ curly braces:
 @@@ -/
 
 def ident2 {α : Type} (a : α) : α := a
@@ -450,207 +400,81 @@ def ident2 {α : Type} (a : α) : α := a
 #eval ident2 false
 
 /- @@@
-That's some beautiful code! The *ident2* function
-appears to be applicable to objects of many different
-types with no extra effort needed to write the explicit
-type argument values. Be sure you compare and contrast
-this code with that using the first version of *ident.*
+## Compose: A Binary Operation on Functions
+
+We can treat functions like first-class values and define operations on them.
+Suppose String.length : String → Nat and isEven : Nat → Bool. We can build
+a function that maps a String to Bool by composing these two.
 @@@ -/
 
-/- @@@
-## Compose: A Binary Operations on Functions
+#eval String.length "Hello" -- String length in Lean
 
-We familiar with mathematical operations on numbers. For
-example, addition takes two numbers as arguments and then
-returns a third. We'll now see that we can treat function
-as objects, just like numbers, and define operations on
-functions, as long as they are in sense composable.
-
-Suppose we have a function, *s2n* that can turn any String
-into a Nat, namely one representing its length, and we have
-another function, *n2b* that turns any Nat into a Bool: true
-if the number is even and false otherwise.
-
-From these two functions we should be able to define a new
-function that takes any String and returns true or false
-depending on  whether its length is even or not. Think
-about how you would do this in Python.
-
-This new function will take a String argument, *s*. It
-will first derive its length as *s2n s*. Then it will
-use this value as the argument to *n2b* to obtain the
-final result.
-@@@ -/
-
-#eval String.length "Hello"   -- String length in Lean
-
-def isEven (n : Nat) : Bool := n%2 == 0
+def isEven (n : Nat) : Bool := n % 2 == 0
 #eval isEven 5
-
 #eval isEven (String.length "Hello")
 #eval isEven (String.length "Hello!")
 
 /- @@@
-We can Generalize these examples to a parameterized function
-from String to Bool that takes any String and returns true or
-false depending on whether its length is even or odd.
-*** -/
+Define a specialized “even length string” function directly:
+@@@ -/
 
- def isEvLenStr (s : String) : Bool := isEven (String.length s)
+def isEvLenStr (s : String) : Bool := isEven (String.length s)
 #eval isEvLenStr "Hello"
 #eval isEvLenStr "Hello!"
 
 /- @@@
-We can now generalize from String, Nat, and Bool to any
-three types whatsoever. Let's write α for any type instead
-of just String; β instead of just Nat, and γ instead of Bool.
-Furthermore, we'll generalize from *String → Nat* to α → β,
-and from Nat → Bool to *g : β → γ.* We'l also change the
-name to *compose*, the name in mathematics of the higher
-order function that takes two compatible functions and
-returns the function that applies the second one after
-applying the first one to its argument to convert any
-argument of type α into one of type γ.
+### Formal Definition
+Generalize to any three types α, β, γ. Given f : α → β and g : β → γ,
+their composition is the function α → γ that maps a to g (f a).
 @@@ -/
 
-def compose {α β γ : Type} (f : α → β) (g : β → γ) :=
-  fun a => g (f a)
+-- the function that applies f after applying g
+def compose {α β γ : Type} (f : β → γ) (g : α → β) :=
+fun a => f (g a)
 
 -- alternative syntax
-def compose' {α β γ : Type} : (α → β) → (β → γ) → (α → γ)
-| f, g => (fun a => g (f a))
+def compose' {α β γ : Type} : (β → γ) → (α → β) →  (α → γ)
+| f, g => (fun a => f (g a))
 
 /- @@@
-Composing String.length and isEven yields the function
-that applies String.length to an argument and applies isEven
-to the result: thus "isEven after String.length", which we
-can also write as (isEven ∘ String.length). We pronounce this
-expresion again as the function, "isEven *after* String.length."
+We can use this function to String.length and isEven:
 @@@ -/
-def isEvLenStr' : String → Bool := compose String.length isEven
+
+def isEvLenStr' : String → Bool := compose isEven String.length
 #eval isEvLenStr' "Hello"
 
 /- @@@
-It's defined in Lean's libraries in an even more
-general way, polymorphic in the type universes from
-which the functions are drawn. You can use apply it
-just as you would our version.
+Lean’s library includes a highly general Function.comp, plus notation ∘.
 @@@ -/
+
 #check Function.comp
-
-#eval compose String.length isEven "Hello"  -- application left assoc
-
-/- @@@
-Lean's library also defines the standard mathematical
-notation for compose viewed as a binary operation on
-functions.
-@@@ -/
+#eval compose isEven String.length  "Hello" -- application is left-assoc
 #eval (isEven ∘ String.length) "Hello!"
 
 /- @@@
-The compose operation is essential a function-building
-function. It takes functions as input arguments and then
-returns a function as a result. It is thus a higher-order
-function in both sense.
+## Theorem: Compose is Associative
 @@@ -/
-def isEvenLengthString := compose String.length isEven
 
-#eval isEvenLengthString "Hello"
-#eval isEvenLengthString "Hello!"
-#eval isEvenLengthString "Hello!!"
+
+theorem comp_assoc {α β γ δ : Type}
+(f : γ → δ)
+(g : β → γ)
+(h : α → β) :
+(f ∘ g) ∘ h = f ∘ (g ∘ h) :=
+rfl
 
 /- @@@
-## Function Definition by Case Analysis
-
-NOT REQUIRED READING YET
-
-One key capability for defining functions that
-we haven't seen yet is analyzing incoming argument
-values of a given type to decide how to construct
-a return value.
-
-As an example, suppose we want to define the
-Boolean negation (*not*, !) function. It takes a
-Boolean argument b, and returns the other Boolean
-value. So if *b = true* the function must return
-false, and if *b = false* the function must return
-true. The high-level point is that the function
-must *inspect b* to know which code to evaluate
-to produce a result value.
-
-A most fundamental form of inspection in Lean is
-to determine which of possibly several *value
-constructors* were used to produce a given data
-value.
-
-Let's look at a simple concrete example. Here is
-the definition of the Bool data type. The first
-line defines Bool as the name of a computational
-type. The details are in the two constructors.
-
-```
-inductive Bool : Type where
-  | false : Bool
-  | true : Bool
-  ```
+The rfl proofs work here because the left-hand
+side reduces to the right-hand sides.
 @@@ -/
 
 /- @@@
-Each constructor definition starts with a vertical
-bar; then gives the name of the constructor, any
-arguments that it takes (none here); and finishes
-by declaring any term of this form will be accepted
-as a term of the type being define, here Bool.
+## Summary
 
-You should also know that the meaning of inductive
-definitions stipulates that there are no values of
-a given type except those that can be constructed
-using the given constructors. In this case, there
-are exactly two terms of type Bool, namely *true*
-and *false*.
-
-So now we're ready to define our function. We'll
-call it *myNeg*. It'll take a Bool value as its
-single input argument and will return an answer
-depending on which of the two constructors built
-the incoming value.
-
-This kind of analysis of an argument is handled
-in Lean using the *match* statement. Here we will
-match the argument *b,* a Bool value, against the
-two possible forms it could take. We call this case
-analysis. In this example there are just two cases.
-
-Each case starts with a vertical bar, then what we
-call a *pattern.* Lean compares the incoming value
-with the pattern first in line. If it matches then
-the term to the right of the => defines the result.
+- Function intro (→.intro): exhibit a lambda, e.g. (fun (s : S) => t s) : S → T
+- Function elim (→.elim): apply a function to an argument, f : S → T, s : S ⇒ f s : T
+- → is right-associative and function application is correspondingly left-associative
+- Partial reduction (application fewer than all arguments) returns a functions
+- Function composition (∘) is associative
+- Type inference and implicit arguments reduce type annotation noise in code
 @@@ -/
-
-def myNeg (b : Bool) : Bool :=
-match b with
-| true => false
-| false => true
-
-#eval myNeg true
-
-
-/- @@@
-Now consider the application of *myNeg* to *true*.
-Call *true* the input value. Lean tries to match
-it against the first pattern in the match statement.
-If the incoming argument matches, then the code to
-the right of the => defines the return result. Lean
-matches in top-to-bottom order.
-
-Recall that a function is correct in and will only
-be accepted by Lean if it's total, meaning there's
-a result for *all* possible argument values. So if
-Lean gets to the end of the list of patterns and
-still hasn't matched, Lean will tell you there are
-*missing cases. Uncomment the following code to see
-such an error.
--/
-
--- def idBool : Bool → Bool
--- | true => true

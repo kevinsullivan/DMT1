@@ -1,60 +1,53 @@
 /- @@@
-# Implication (→)
+  ImplicationInference.lean
+  -------------------------
+  Inference rules and basic theorems for implication `→` in Lean 4,
+  with examples mirroring the style used for the `↔` (iff) file.
 
-<!-- toc -->
+  All explanatory comment blocks use the custom bracket markers:
+    opening:  /- @@@
+    closing:  @@@ -/
 
-In everyday logic the → connective represent
-a conditional statement, asserting that if
-some proposition, let's call it *P*, is true,
-then some other proposition, *Q*, must be, too.
-
-We call such a statement an implication. We can
-shorten by saying *P implies Q*. In standard
-notation we'd write is as *P → Q*.
-
-This section explains this form of logical
-proposition, its inference rule, with some
-examples of theorems provable from the axioms.
-@@@ -/
-
-/- @@@
-## Example: Reactor Safety
-
-The power of logic, and of mathematics more
-generally, is that they provide concepts and
-and notations that we can use to represent
-and then analyze interesting worlds. We map
-natural language descriptions of worlds of
-interest to formal mathematical/logical terms
-and then we can reason deductively about the
-worlds we've represented in this manner.
-
-Consider an example of a reactor safety system.
-A key requirement is that if the temperature is
-too high, the shutdown sequence must be initiated.
-
-We’ll use propositional variables to model each
-of the conditions separately (too hot, shutdown
-started). Then we'll form the implication. Then
-we'll reason from there
+  Inside these comment blocks, code/text examples are fenced with
+  four backticks (````) to avoid conflicting with chat formatting.
 @@@ -/
 
 namespace ImplicationInference
 
 /- @@@
-If *HighTemp* and *ShutdownStarted* are propositions,
-then *HighTemp → ShutdownStarted* is a proposition, too.
-@@@ -/
-axiom HighTemp : Prop           -- e.g., temp too high
-axiom ShutdownStarted : Prop    -- e.g., shutdown initiated
-#check (HighTemp → ShutdownStarted)   -- it's a Prop
+# Implication (→)
 
+In everyday logic the `→` connective represents a conditional statement,
+asserting that if some proposition, call it *P*, is true, then some other
+proposition, *Q*, must be true as well. We call this an *implication* and
+write it as `P → Q`.
+
+This section explains this form of logical proposition, its inference rules,
+and includes examples of theorems provable from the rules.
+@@@ -/
+
+/- @@@
+## Example: Reactor Safety
+
+Mathematical logic gives us concepts and notations we can use to represent
+and analyze interesting worlds. We map natural-language descriptions into
+formal propositions and then reason deductively about those worlds.
+
+Consider a reactor safety requirement: if the temperature is too high, the
+shutdown sequence must be initiated. We model these as propositional
+variables and then form the implication `HighTemp → ShutdownStarted`.
+@@@ -/
+
+axiom HighTemp : Prop           -- temperature is too high
+axiom ShutdownStarted : Prop    -- shutdown sequence initiated
+
+#check (HighTemp → ShutdownStarted)   -- it's a Prop
 
 /- @@@
 ## The → Proposition Builder
 
-Moew generally, If P and Q are arbitrary propositions,
-then P → Q is also a proposition (read: “if P then Q”).
+More generally, if `P` and `Q` are arbitrary propositions, then `P → Q`
+(read “if `P` then `Q`”) is also a proposition.
 @@@ -/
 
 axiom P : Prop
@@ -62,205 +55,149 @@ axiom Q : Prop
 #check P → Q
 
 /- @@@
-## Inference Rules for `→`
+## Inference Rules for `→` (with named hypotheses and explicit proof terms)
 
-The inference rules for → have been crafted so
-that an implication has precisely the sense that
-we intend: *if P is true then so is Q.* In Lean's
-constructive logic, this becomes, if *P* is true,
-as shown by a proof, *(p : P)*, then there will
-always be a way to derive a proof of *Q*, making
-it true as well.
+The rules for `→` capture the intended meaning: if `P` is true then `Q` is
+true. In constructive type theory (Lean), a proof of `P → Q` *is* a function
+that transforms any proof `p : P` into a proof `q : Q`.
 
-Such a statement can itself be true or false.
-For example, the statement, if it rains for
-long enough then the ground will be wet, would
-generally be judged as true in the real world;
-but the statement, if you're rich you won't have
-any other problems would generally be regarded as
-false in general.
+We present the rules with explicit hypothesis names and explicit proof
+constructions in the conclusions.
 
-So now we're set to introduce the inference rules
-that formalize these ideas thereby capturing the
-very concept that we want. So here he go.
+````text
+-- Introduction (→.intro)
+-- To prove an implication, construct a function from proofs of P to proofs of Q.
+Γ ⊢ qOf : P → Q
+--------------------------- →.intro
+Γ ⊢ qOf : P → Q
+  (e.g., qOf = (fun (p : P) => ... : Q))
 
-*Implication* has **one introduction rule** and
-**one elimination rule**, known in Latin as modus
-ponens. In short, to prove an implication you'll
-show there is a way to turn any proof of *P* into
-a proof of *Q*, showing that if *P* is true then
-so is *Q*.
+-- Elimination / Modus Ponens (→.elim)
+-- From a function h : P → Q and an argument p : P, obtain Q by application.
+Γ ⊢ h : P → Q      Γ ⊢ p : P
+-------------------------------- →.elim
+Γ ⊢ h p : Q
 
-The → elimination rule gives you a way to *use* a
-proof, *f*, of an implication. You use it by viewing
-it as a function and by *applying* it to any proof,
-*(p : P)*. The result is a proof of *Q*. To prove
-*Q* when you have *P → Q* and *P*, all you have to
-say in English is *the proof is by → elimination*
-or *by applying *f* to *p*. We now look at these
-ideas in a little more detail.
+Remarks:
 
-### →.intro (introduction)
+    The introduction rule is by exhibiting a lambda, e.g. fun (p : P) => ....
 
-To prove that an implication is true we have to
-show that if one is given a proof *(p : P) that
-shows that *P* is true, then there will always
-be a a way to construct proof of *Q,* showing
-that if there's a proof of *P* there is a proof
-of *Q*, so *if P is true, then Q must be too."
+    The elimination rule is function application (modus ponens): given h and p,
+    the term h p is a proof of Q.
+    @@@ -/
 
-In our constructive logic, the way we show that
-one can derive a proof of *Q* given a proof of
-*P* by providing a lambda abstraction (function
-in Lean) that, if given any such *p* computes a
-(q : Q).
+/- @@@
+→.elim (modus ponens) in the reactor example
 
-To *prove* an implication P → Q, provide a function
-that takes a proof of P and returns a proof of Q.
+Suppose we know both that high temperature implies shutdown, f : HighTemp → ShutdownStarted,
+and that high temperature holds, h : HighTemp. Then f h : ShutdownStarted is a proof of shutdown,
+by → elimination (function application).
 
-````
-Γ ⊢ f : P → Q               -- f viewed as function
----------------- →-intro    -- name of inference rule
-Γ ⊢ f : P → Q               -- f viewed as a proof!
-````
+Γ ⊢ f : HighTemp → ShutdownStarted     Γ ⊢ h : HighTemp
+------------------------------------------------------- →.elim
+Γ ⊢ f h : ShutdownStarted
 
-
-This looks tautological (like we've said nothing at
-all), but the point is that in construtive logic, a
-term of type `P → Q` *is* a function from proofs of
-*P* to proofs of *Q*, and the totality of functions
-(defined by lambda abstractions in Lean) ensures it
-works for *any* proof of *P*.
-
-### →.elim (elimination / modus ponens)
-
-To continue with our example, suppose now that we
-have proofs, *f : HighTemp → ShutdownStarted* and
-*(h : HighTemp)*. In other words, if the heat is
-too much a shutdown will occur, and the heat is too
-high.  In this context we can use the inference
-rule, → elimination, which is to say just *function
-application*, to prove *Q*.
 @@@ -/
 
 axiom h : HighTemp
 axiom f : HighTemp → ShutdownStarted
-#check (f h)  -- *function application* proves Q
+#check (f h) -- function application produces a proof of ShutdownStarted
 
 /- @@@
-Here's the inference rule notation for this concept.
-````
-Γ ⊢ h : P → Q Γ ⊢ p : P
------------------------------ →-elim
-Γ ⊢ h p : Q
-````
+Another Example: Rain, Wet, Slippy
 
-You can read it like this. If in any context,
-*P → Q* is true with proof *f*, and if in that
-same context *P* is true with proof *p*, then
-*Q* must be true and *(f p)* will be the proof.
+Let Rain, Wet, and Slippy be propositions for:
+
+    “it’s raining,”
+
+    “the street is wet,” and
+
+    “the street is slippy.”
+
+Assume implications:
+
+    rtow : Rain → Wet,
+
+    wtos : Wet → Slippy,
+    and also assume rain : Rain.
+
+We can conclude Slippy by chaining implications via →.elim.
 @@@ -/
 
-/- @@@
-## Another Example
-
-Let Rain, Wet, and Slippy be the propositions (in
-English), *it’s raining*; *the street is wet*; and the
-*street is slippy*). Furthermore, let *rainWet* be
-the proposition, *f it rains then it’s wet,” and let
-*wetSlippy* be the proposition, *if it’s wet then the
-streets are slippy.* Finally, let's assume that it
-is raining.
-
-Can we then conclude that the streets are slippy?
-Yes. It's raining. Applying rainWet then shows the
-streets are wet. Finally applying wetSklippy to that
-fact shows that the streets are slippy. We reason
-through a *chain* of implications from a premise,
-to intermediate facts, then to a final conclusion.
-@@@ -/
-
-axiom Rain   : Prop
-axiom Wet    : Prop
+axiom Rain : Prop
+axiom Wet : Prop
 axiom Slippy : Prop
 
-axiom rtow   : Rain → Wet
+axiom rtow : Rain → Wet
 axiom wtos : Wet → Slippy
-axiom rain      : Rain
+axiom rain : Rain
 
 #check
-  let wet := rtow rain      -- modus ponens
-  let slippy := wtos wet    -- modus ponens
-  slippy                    -- conclusion
+let wet := rtow rain -- modus ponens
+let slippy := wtos wet -- modus ponens
+slippy -- conclusion : Slippy
 
--- Written concisely
+-- Concisely:
 #check wtos (rtow rain)
 
 /- @@@
-## Theorems
+Theorems
 
-The inference rules of →, taken as axiomatically true,
-has some important properties. We'll prove two of them.
+From the → rules we can derive familiar properties.
+We include reflexivity and transitivity.
 @@@ -/
 
 /- @@@
-### Implication (→) is Reflexive
+Implication (→) is Reflexive
 
-First, implication is reflexive. That's to say, it is
-always true, for any proposition, *P*, that *P → P*. In
-other words, if *P* is true as witnessed by some proof,
-*p*, then *P* is true, as witnessed by that same *p*,
-so *P → P*. The function that converts proofs of *P* to
-proofs of *P*, proving *P → P*, is just the identity
-function on such proofs.
+For any proposition P, we have P → P. The proof term is the identity
+function on proofs of P.
+
+(no hypotheses)
+--------------------------- →.intro
+Γ ⊢ (fun (p : P) => p) : P → P
+
 @@@ -/
 
-theorem refl (P : Prop) : P → P := sorry  -- exercise
-
+theorem refl (P : Prop) : P → P :=
+fun p => p
 
 /- @@@
-### Implication (→) is Transitive
+Implication (→) is Transitive
 
-We now state and prove as a theorem that *implication
-is transitive*. In other words, from proof of *P → Q*
-and of *Q → R* we can always derive proof of *P → R*.
-In particular, the composition of the two function is
-a function from *P* to *R*, proving the overall claim.
-We prove this in a few equivalent styles for comparison.
+From proofs of P → Q and Q → R, we obtain a proof of P → R by composing
+the functions.
+
+Γ ⊢ f : P → Q      Γ ⊢ g : Q → R
+------------------------------------
+Γ ⊢ (fun (p : P) => g (f p)) : P → R
+
 @@@ -/
 
--- A verbose but easier to follow proof
+-- A more verbose, step-by-step construction
 theorem trans
-  {P Q R : Prop} :
-    (P → Q) → (Q → R) → (P → R)
-  | pq, qr => fun (p : P) =>
-      let q := pq p
-      let r := qr q
-      r
+{P Q R : Prop} :
+(P → Q) → (Q → R) → (P → R)
+| pq, qr => fun (p : P) =>
+let q := pq p
+let r := qr q
+r
 
--- A much less verbose version
+-- A concise pointfree-style version
 theorem trans' {P Q R : Prop} :
-  (P → Q) → (Q → R) → (P → R) :=
-  fun pq qr => fun p => qr (pq p)
+(P → Q) → (Q → R) → (P → R) :=
+fun pq qr => fun p => qr (pq p)
 
 /- @@@
-Here are examples applying the *theorem*. The
-theorem itself is a function here, and one that
-can be partially applied to any three propositions.
-Applying a general theorem to specific parameters
-*specializes* it by β reduction, substituting in
-the actual propositions for the formal parameters.
+Specializing a General Theorem
 
-In the following example, , we apply *trans*, which
-is defined in terms of *any* three propositions, to
-three particular ones, yielding the proposition that
-has the particular propositions substituted in by
-β reduction (function *application*).
+The trans theorem is polymorphic in P Q R. Applying it to
+specific propositions specializes it (β-reduction).
 
-Note: The @before *trans* disables implicit arguments.
-Unless we did that our expressions would not work, as
-Lean will not accept explicit arguments if told they'll
-be given implicitly (by the curly braces above).
+-- After specialization:
+Γ ⊢ trans Rain Wet Slippy
+  : (Rain → Wet) → (Wet → Slippy) → (Rain → Slippy)
+
 @@@ -/
 
 def rainMakesSlippy := @trans Rain Wet Slippy
@@ -270,30 +207,32 @@ def rainMakesSlippy := @trans Rain Wet Slippy
 #reduce (proofs := true) (@trans Rain Wet Slippy)
 -- Lean shows: fun x x_1 p => x_1 (x p)
 
-
 /- @@@
-Given our assumptions we can now prove *Wet → Slippy*.
+Given our assumptions we can now prove Rain → Slippy by transitivity.
 @@@ -/
 
-theorem wetImpSlippy :  Rain → Slippy := trans rtow wtos
+theorem rainImpSlippy : Rain → Slippy :=
+trans rtow wtos
 
 -- With a proof of rain, we get Slippy.
-#check wetImpSlippy rain  -- : Slippy
+#check rainImpSlippy rain -- : Slippy
 
 /- @@@
-## Summary: → axioms and theorems
+Summary: → rules and derived theorems
 
-Given P, Q, R : Prop.
+Given P Q R : Prop.
 
-Axioms / rules (as used in Lean):
+Rules (as used in Lean):
 
-- →.intro : To prove P → Q, assume p : P then construct q : Q
-- →.elim  : From h : P → Q and p : P, infer h p : Q  (modus ponens)
+    →.intro : To prove P → Q, provide a function (fun (p : P) => q : Q).
 
-Some derived theorems:
+    →.elim : From h : P → Q and p : P, infer h p : Q (modus ponens).
 
-- refl : P → P
-- trans  : (P → Q) → (Q → R) → (P → R)
-@@@ -/
+Derived theorems:
+
+    refl : P → P
+
+    trans : (P → Q) → (Q → R) → (P → R)
+    @@@ -/
 
 end ImplicationInference
