@@ -402,30 +402,92 @@ def ident2 {α : Type} (a : α) : α := a
 /- @@@
 ## Compose: A Binary Operation on Functions
 
-We can treat functions like first-class values and define operations on them.
-Suppose String.length : String → Nat and isEven : Nat → Bool. We can build
-a function that maps a String to Bool by composing these two.
+We can treat functions like first-class values and
+define operations on them. In particular, if we
+have two functions, f : S → T, and g : T → W, we
+can compose them into a new function by sending
+the output of *f* to the input of *g* and viewing
+the whole thing as a single new function.
+
+```
+(w : W) <-- [[g] <-- (t : T) <-- [f]] <-- (s : S)
+```
+
+In this data flow diagram, functions are in [].
+So *g* is a function, *f* is a function, and the
+composition of them is a function. When applied
+to an argument, *s*, on the right, *s* is taken
+as input by the composed function, which applies
+*f* to it then passes the result as the input to
+*g*. The composed funciton returns the result from
+*g* as the result of the composed function.
+
+## Example
+
+Suppose we want a function that takes any String,
+*s*, and returns a Bool: true if the length of the
+string is even, and false otherwise. We note that
+Lean already provides a String.lenght function.
+And we can easily define a funciton that computes
+the *parity* (even/oddness) of a natural number.
+Our big ahah! We can compose these two simple and
+elegant functions into the function we want. We do
+*not* need to code it from scratch. Here's isEven.
 @@@ -/
 
+def isEven (n : Nat) : Bool := n % 2 == 0
+
+/- @@@
+Our idea is to determine parity (even-true/odd-false)
+of a string's length we first apply String.length to
+compute its length. Then we apply isEven to that Nat
+value to determine whether the string is of even or odd
+length. To compose the two functions, we apply isEven
+*after* String.length to a given string.
+@@@ -/
+
+-- Spply String.length to given String
 #eval String.length "Hello" -- String length in Lean
 
-def isEven (n : Nat) : Bool := n % 2 == 0
+-- Apply isEven to the result of that first application
 #eval isEven 5
+
+/- @@@
+Voila, the answer! We can of course automate the
+procedure we just carried out by hand, with nested
+applications handling the passing of the output of
+the first function (length) to the input of the next
+(isEven). Our new code autoamtically applies *isEven
+after String.length*. Here we can see it working.
+
+@@@ -/
 #eval isEven (String.length "Hello")
 #eval isEven (String.length "Hello!")
 
-/- @@@
-Define a specialized “even length string” function directly:
-@@@ -/
+-- Now we package that as a function taking *any* string
+def isEvLenStr (s : String) : Bool :=
+  isEven (String.length s)
 
-def isEvLenStr (s : String) : Bool := isEven (String.length s)
+-- It works!
 #eval isEvLenStr "Hello"
 #eval isEvLenStr "Hello!"
 
 /- @@@
-### Formal Definition
-Generalize to any three types α, β, γ. Given f : α → β and g : β → γ,
-their composition is the function α → γ that maps a to g (f a).
+We have thus *composed* isEven and String.length to
+produce a new function. It takes a String, applies
+*length* then applies *isEven* to the length result.
+
+The intermediate result (the Nat representing the length
+of the string), and its being passed from the output of
+String.length to the the input to isEven, are now handled
+inside the new function as a hidden implementation detail.
+@@@ -/
+
+/- @@@
+Generalizing from this particular example by replacing
+the specific types, Nat, Bool, and String with parameters
+leads to the important concept of composition as fundamental
+operation on functions, just as addition is for numbers.
 @@@ -/
 
 -- the function that applies f after applying g
@@ -437,19 +499,32 @@ def compose' {α β γ : Type} : (β → γ) → (α → β) →  (α → γ)
 | f, g => (fun a => f (g a))
 
 /- @@@
-Example: We can use this function to String.length and isEven:
+Example: We can apply the generalize compose
+function to our two functions as special cases
+to compose them into a special purpose result:
+the function we want. We now now composition as
+an fundamental operation on compatible functions.
+
+By compatible we mean that the output type of
+the first as to be the same as the input type
+of the second, so that output from the first
+can given to the second function as its input.
 @@@ -/
 
-def isEvLenStr' : String → Bool := compose isEven String.length
+def isEvLenStr' : String → Bool :=
+  compose isEven String.length
+
 #eval isEvLenStr' "Hello"
 
 /- @@@
-Lean’s library includes Function.comp with notation ∘.
+Lean’s library defines compose as *Function.comp*
+with infix notation ∘.
 @@@ -/
 
 #check Function.comp
 #eval compose isEven String.length  "Hello" -- application is left-assoc
 #eval (isEven ∘ String.length) "Hello!!!"
+#check (isEven ∘ String.length)             -- String → Bool
 
 /- @@@
 ## Theorems
