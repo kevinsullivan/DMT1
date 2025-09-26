@@ -437,36 +437,57 @@ def compose' {α β γ : Type} : (β → γ) → (α → β) →  (α → γ)
 | f, g => (fun a => f (g a))
 
 /- @@@
-We can use this function to String.length and isEven:
+Example: We can use this function to String.length and isEven:
 @@@ -/
 
 def isEvLenStr' : String → Bool := compose isEven String.length
 #eval isEvLenStr' "Hello"
 
 /- @@@
-Lean’s library includes a highly general Function.comp, plus notation ∘.
+Lean’s library includes Function.comp with notation ∘.
 @@@ -/
 
 #check Function.comp
 #eval compose isEven String.length  "Hello" -- application is left-assoc
-#eval (isEven ∘ String.length) "Hello!"
+#eval (isEven ∘ String.length) "Hello!!!"
 
 /- @@@
-## Theorem: Compose is Associative
+## Theorems
+
+We're now set up to prove some interesting theorems,
+deducing their truths from the basic axioms.
+
+### Function → is Transitive
+
+Conjecture: → is transitive. In other words, we
+claim that Iif there's any function, f: α → β,
+and if there's any function g : β → γ, then there
+is a function from α to γ.
+
+Proof: Let h = g ∘ f. This funtion exists (compose
+is a total function so it must produce a funcion)
+and *h* is also of type α → γ.
 @@@ -/
 
+def arrow_trans {α β γ : Type} :
+  (β → γ) → (α → β) → (α → γ) :=
+  fun g f => g ∘ f
 
-theorem comp_assoc {α β γ δ : Type}
+#check arrow_trans
+
+/- @@@
+### Function Composition is Associative
+@@@ -/
+
+theorem comp_assoc {α β γ : Type}
+-- assume three composable functions
 (f : γ → δ)
 (g : β → γ)
 (h : α → β) :
-(f ∘ g) ∘ h = f ∘ (g ∘ h) :=
-rfl
-
-/- @@@
-The rfl proofs work here because the left-hand
-side reduces to the right-hand sides.
-@@@ -/
+-- you can move parens without changing meanings
+(f ∘ g) ∘ h = f ∘ (g ∘ h)
+-- both side reduce to the same (right side) term
+:= rfl
 
 /- @@@
 ## Summary
