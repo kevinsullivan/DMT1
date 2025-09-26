@@ -219,9 +219,11 @@ functions.
 
 def compose
   {P Q R : Type}        -- if we have these types
-  (h₁ : P → Q)          -- and h₁ takes P and returns Q
-  (h₂ : Q → R) :        -- and h₂ takes Q and returns R
-  (P → R) := h₂ ∘ h₁    -- h₁ ∘ h₂ takes P and returns R
+  (h₁ : Q → R)          -- and h₁ takes P and returns Q
+  (h₂ : P → Q ) :        -- and h₂ takes Q and returns R
+  (P → R) := h₁ ∘ h₂    -- h₁ ∘ h₂ takes P and returns R
+
+#check compose smelt crush
 
 /- @@@
 Compare and constrast these two definitions. They're
