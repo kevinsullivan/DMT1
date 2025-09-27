@@ -5,6 +5,7 @@
 *and* implies *equivalence*. In other words,
 if for any propositions, X and Y, X ∧ Y is
 true, then it must be that X ↔ Y is as well.
+Call your theorem andImpEquiv.
 @@@ -/
 
 
@@ -47,10 +48,7 @@ case (here involving X and Y) of the general claim.
 @@@ -/
 
 -- Answer
-axiom X : Prop
-axiom Y : Prop
-axiom h : X ∧ Y
-#check andImpEquiv h
+
 
 
 /- @@@
@@ -94,8 +92,8 @@ evidence Lean needs to know it's ok to accept the
 definition.
 @@@ -/
 
-axiom K : Prop
-def exFalsoK : False → K := fun (f : False) => nomatch f
+-- ANSWER
+
 
 /- @@@
 Why is it safe to accept tihs definition? What do we
@@ -113,7 +111,8 @@ P and Q are aribtrary propositions, then False *and*
 P implies Q.
 @@@-/
 
-example (P Q : Prop): False ∧ P → Q := fun h => nomatch h.left
+-- ANSWER
+
 
 /- @@@
 Write a short paragraph stating the proposition to be
