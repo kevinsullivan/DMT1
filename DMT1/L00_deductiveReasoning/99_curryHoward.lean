@@ -20,30 +20,35 @@ Key Principle:
 ## ⊤ (True) ↔ Unit (PUnit)
 
 Logical (Prop):
+
 - (intro) `True.intro : True`
 
 Computational (Type):
+
 - (intro) `Unit.unit : Unit` or `PUnit.unit : PUnit`
 
 Correspondence:
+
 - `True` is the trivially true proposition
 - `Unit`/`PUnit` is the type with exactly one inhabitant
 - A proof of `True` corresponds to the single value `()`
 
-
 ## ∧ (And) ↔ × (Prod)
 
 Logical (Prop):
+
 - (intro) `And.intro : P → Q → P ∧ Q`
 - (elim₁) `And.left : P ∧ Q → P`
 - (elim₂) `And.right : P ∧ Q → Q`
 
 Computational (Type):
+
 - (intro) `Prod.mk : α → β → α × β`
 - (elim₁) `Prod.fst : α × β → α`
 - (elim₂) `Prod.snd : α × β → β`
 
 Correspondence:
+
 - `P ∧ Q` is "both P and Q are true"
 - `α × β` is "a pair containing both α and β"
 - A proof of conjunction is a pair of proofs
@@ -54,14 +59,17 @@ Correspondence:
 ## → (Implication) ↔ → (Function Type)
 
 Logical (Prop):
+
 - (intro) lambda abstraction: `fun (_ : P) => ... : Q`
 - (elim) function application: `(P → Q) → P → Q`
 
 Computational (Type):
+
 - (intro) lambda abstraction: `fun (_ : α) => ... : β`
 - (elim) function application: `(α → β) → α → β`
 
 Correspondence:
+
 - `P → Q` is "if P then Q"
 - `α → β` is "function from α to β"
 - A proof of an implication is a function from proofs to proofs
@@ -97,16 +105,19 @@ Correspondence:
 ## ↔ (Iff/Logical) ↔ ≃ (Equivalence/Computational)
 
 Logical (Prop):
+
 - (intro) `Iff.intro : (P → Q) → (Q → P) → (P ↔ Q)`
 - (elim→) `Iff.mp : (P ↔ Q) → P → Q`
 - (elim←) `Iff.mpr : (P ↔ Q) → Q → P`
 
 Computational (Type):
+
 - (intro) `Equiv.mk : (α → β) → (β → α) → (some proofs) → α ≃ β`
 - (elim→) `Equiv.toFun : (α ≃ β) → α → β`
 - (elim←) `Equiv.invFun : (α ≃ β) → β → α`
 
 Correspondence:
+
 - `P ↔ Q` is "P if and only if Q"
 - `α ≃ β` is "α and β are in bijection"
 - Logical equivalence is bidirectional implication
@@ -114,20 +125,22 @@ Correspondence:
 - Iff is the Prop-level version of type isomorphism
 - Note: Full `Equiv` includes proofs that functions are inverses
 
-
 ## ∨ (Or) ↔ ⊕ (Sum)
 
 Logical (Prop):
+
 - (intro₁) `Or.inl : P → P ∨ Q`
 - (intro₂) `Or.inr : Q → P ∨ Q`
 - (elim) `Or.elim : P ∨ Q → (P → R) → (Q → R) → R`
 
 Computational (Type):
+
 - (intro₁) `Sum.inl : α → α ⊕ β`
 - (intro₂) `Sum.inr : β → α ⊕ β`
 - (elim) `Sum.elim : α ⊕ β → (α → γ) → (β → γ) → γ`
 
 Correspondence:
+
 - `P ∨ Q` is "either P or Q (or both)"
 - `α ⊕ β` is "tagged union: either α or β"
 - A proof of disjunction is either a proof of left or right
@@ -137,12 +150,15 @@ Correspondence:
 ## ⊥ (False) ↔ Empty
 
 Logical (Prop):
+
 - (elim) `False.elim : False → α`
 
 Computational (Type):
+
 - (elim) `Empty.elim : Empty → α` or `Empty.rec : Empty → α`
 
 Correspondence:
+
 - `False` is the proposition with no proofs
 - `Empty` is the type with no inhabitants
 - From a proof of `False`, we can prove anything (ex falso)
@@ -152,16 +168,19 @@ Correspondence:
 ## ¬ (Negation) ↔ → Empty
 
 Logical (Prop):
+
 - (def) `Not P := P → False`
 - (intro) derive `P → False` by showing P leads to contradiction
 - (elim) function application: `¬P → P → False`
 
 Computational (Type):
+
 - (def) No special type, but morally: `α → Empty`
 - (intro) lambda abstraction: `fun (_ : α) => ... : Empty`
 - (elim) function application: `(α → Empty) → α → Empty`
 
 Correspondence:
+
 - `¬P` is "P is false"
 - `α → Empty` is "no values of type α exist (uninhabited)"
 - A proof that P is false is a function from P to absurdity
@@ -172,14 +191,17 @@ Correspondence:
 ## ∃ (Exists) ↔ Σ (Sigma/Dependent Pair)
 
 Logical (Prop):
+
 - (intro) `Exists.intro : ∀ {α} {p : α → Prop} (w : α), p w → ∃ x, p x`
 - (elim) `Exists.elim : (∃ x, p x) → (∀ w, p w → R) → R`
 
 Computational (Type):
+
 - (intro) `Sigma.mk : (a : α) → β a → Σ x : α, β x`
 - (elim) `Sigma.elim : (Σ x : α, β x) → (∀ x, β x → γ) → γ`
 
 Correspondence:
+
 - `∃ x : α, p x` is "there exists an x such that p(x)"
 - `Σ x : α, β x` is "dependent pair: x and a value of type β(x)"
 - A proof of existence is a witness plus a proof for that witness
@@ -192,14 +214,17 @@ Correspondence:
 ## = (Equality) ↔ = (Path/Identity Type)
 
 Logical (Prop):
+
 - (refl) `Eq.refl (a : α) : a = a`
 - (rec) `Eq.rec : {motive : α → Sort u} → a = b → motive a → motive b`
 
 Computational (Type):
+
 - (refl) `Eq.refl (a : α) : a = a` (same!)
 - (rec) `Eq.rec : {motive : α → Sort u} → a = b → motive a → motive b` (same!)
 
 Correspondence:
+
 - `a = b` as proposition: "a and b are the same"
 - `a = b` as type: "path/identity between a and b"
 - A proof of equality is a witness that two things are the same
