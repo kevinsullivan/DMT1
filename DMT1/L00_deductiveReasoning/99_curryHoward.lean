@@ -12,7 +12,7 @@ type-theoretic structure.
 
 Key Principle:
 
-- Logicall Propositions correspond to Data and Function Types
+- Logical Propositions correspond to Data and Function Types
 - Proofs correspond to computational Terms including Functions
 - Proof construction corresponds to evaluation of proof terms
 
