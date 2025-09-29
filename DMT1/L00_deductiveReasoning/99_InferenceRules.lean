@@ -28,7 +28,7 @@ known as the Curry Howard Correspondence, as you know).
 
 In Lean, → is notation for ∀. (In particular, it's notation
 for the special case of a non-dependent ∀. We'll get to this
-later.) Lambda asbtractions define total functions. The rules
+later.) Lambda abstractions define total functions. The rules
 here are basically identical to those for →. As you already
 understand →, you now understand ∀ but for syntactic details.
 
@@ -61,4 +61,5 @@ understand →, you now understand ∀ but for syntactic details.
 
 - (refl)    `rfl` / `Eq.refl  : a = a`
 - (rec)     `Eq.rec    : {motive : α → Sort u} → a = b → motive a → motive b`
+
 @@@ -/
