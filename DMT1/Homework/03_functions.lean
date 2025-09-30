@@ -315,7 +315,7 @@ replace the name of any unused argument with _.
 
 @@@ -/
 
-def fTrue : Nat → Nat → Nat
+def fTrue : fBool
 | n1, _  => n1  -- complete the definition
 
 /- @@@
@@ -326,7 +326,7 @@ returns the value of the "false branch,"
 the second argument, which is to say *n2*.
 @@@ -/
 
-def fFalse : Nat → Nat → Nat
+def fFalse :fBool
 | _, n2  => n2
 
 
@@ -409,21 +409,6 @@ respectively.
 @@@ -/
 
 -- Answer here
-
-def ifThenElsePoly {α : Type} : Bool → α → α → α
-  | true, x, _ => x
-  | false, _, y => y
-
-#eval ifThenElsePoly true "Hello" "Goodbye"   -- "Hello"
-#eval ifThenElsePoly false "Hello" "Goodbye"  -- "Goodbye"
-
-#eval ifThenElsePoly true 5 4                 -- 5
-#eval ifThenElsePoly false 5 4                -- 4
-
-#eval ifThenElsePoly true true false          -- true
-#eval ifThenElsePoly false true false         -- false
-
-#check ifThenElsePoly
 
 
 /- @@@

@@ -1,241 +1,270 @@
 /- @@@
-So now we finally come to where we'll
-need all the information here: to grasp
-the concept of disjunctions: propositions
-constructed by applying *Or* to anyt two
-propositions. Here's Lean's definition
-of the connective and introduction rules.
+# Disjunction (∨)
 
-```
-inductive Or (a b : Prop) : Prop where
-  | inl (h : a) : Or a b
-  | inr (h : b) : Or a b
-```
+<!-- toc -->
 
-The first line defines the connective. It
-says, if *a* and *b* are any propositions,
-then *Or a b* is also one. Lean defines
-the standard logical notation for *Or*,
-namely ∨, so *Or a b* is typically written
-as *a ∨ b*.
-
-The remaining two lines define the *two*
-variant methods of constructing a proof
-of such a proposition. The first proof
-constructor is called *inl*, short for
-*intro_left*. It requires a proof of *a*
-as an argument. The second constructor
-is called *inr*, for *intro_right*, and
-it requires a proof of *b* as an argument.
-
-The upshot is that if you have neither a
-proof of *a* nor of *b* then you cannot
-create a proof of *a ∨ b*. On the other
-hand, if you have a proof of *either*,
-you can, but you have to pick which of
-the two available *forms* or *shapes*:
-either *inl (_ : a)* or *inr (_ : b)*.
-
-Let's look at a few examples. We'll use
-four propositions. The first two, 0 = 0
-and 1 = 1 are true and we provide proofs
-("by the reflexivity of equality.") The
-third and fourth propositions are false
-so there are no proofs.
+This section briefly presents and
+illustrates the ∨ connective, its intended
+meaning, and the inference rules that capture
+that meaning. It's called *disjunction*,
+logical *or*, or simply *Or*.
 @@@ -/
 
-def pfZEqZ : 0 = 0 := rfl
-def pfOEqO : 1 = 1 := rfl
+namespace OrInference
 
 /- @@@
-Now let's form some disjunctions and see
-if we can prove them.
+## Example: Fire ∨ Flood
+
+Now imagine as ystem with two emergency
+conditions and an alarm. **Either** condition
+should trigger the alarm.
+
+We can formalize this scenario by defining
+three propositions, we'll call `Fire`, `Flood`,
+and `Alarm` We'll stipulate that their being
+true corresponds to the respective conditions
+being present.
 @@@ -/
 
-theorem bothTrue : 0 = 0 ∨ 1 = 1 := Or.inl pfZEqZ
-theorem leftTrue : 0 = 0 ∨ 2 = 3 := Or.inl pfZEqZ
-theorem rightTrue : 2 = 3 ∨ 1 = 1 := Or.inr pfOEqO
--- uncomment the next line; no way to finish proof
--- theorem neitherTrue : 2 = 3 ∨ 3 = 4 := _
+/-- Propositions -/
+axiom Fire : Prop    -- true means A pressed
+axiom Flood : Prop    -- true means B pressed
+axiom Alarm   : Prop    -- true means alarm sounding
 
 /- @@@
-So there you go: How to form disjunctions using ∨
-and the two ways to form proofs of disjunctions in
-cases where they're true.
+Now we can formally model the overall system
+behavior as `(Fire ∨ Flood) → Alarm`. This is
+just  the form of proposition proven by the
+Or.introduction inference rule.
+@@@ -/
 
-The remaining question is about the *elimination*
-rule for *Or*. For *And* there were two, one that
-used a proof, (⟨ p, q ⟩ : P ∧ Q) to prove *P*, and
-the other to prove *Q*. The elimination rule for Or
-feels and is very different. We'll talk about it at
-our next meeting.
+
+/- @@@
+## The ∨ Proposition Builder
+
+If P and Q are arbitrary propositions, then P ∨ Q is
+also a proposition. The intended meaning of this new
+proposition is that it asserts that at least one of P
+or Q is true. There is either a proof of P or there is
+a proof of Q (or both).
+@@@ -/
+
+axiom P : Prop
+axiom Q : Prop
+#check P ∨ Q
+
+/- @@@
+## Inference Rules
+
+*Or* has **two introduction rules** (left and right)
+and **one elimination rule**. The introduction rules
+show how to prove a disjunction from proof of one side.
+The elimination rule (a.k.a. *case analysis*) shows
+how to *use* a disjunction.
+
+### Or.inl / Or.inr (Introductions)
+
+````
+    Γ ⊢ p : P
+--------------------- ∨-intro-left
+Γ ⊢ (Or.inl p) : P ∨ Q
+
+    Γ ⊢ q : Q
+--------------------- ∨-intro-right
+Γ ⊢ (Or.inr q) : P ∨ Q
+````
+
+
+### Or.elim (By Cases)
+
+````
+Γ ⊢ h : P ∨ Q   Γ ⊢ f : P → R   Γ ⊢ g : Q → R
+---------------------------------------------- ∨-elim
+      Γ ⊢ (Or.elim h f g) : R
+````
+
+Intuitively: if from P you can get R, and from Q
+you can get R, then from P ∨ Q you can also get R.
+@@@ -/
+
+def inl {P Q : Prop} (p : P) : P ∨ Q := Or.inl p
+def inr {P Q : Prop} (q : Q) : P ∨ Q := Or.inr q
+def elim {P Q R : Prop} (h : P ∨ Q) (f : P → R) (g : Q → R) : R :=
+  Or.elim h f g
+
+-- Be sure you understand their types!
+#check (@inl)         -- our wrapper for Or.inl
+#check (@inr)         -- our wrapper for Or.inr
+#check (@elim)        -- our wrapper for Or.elim
+
+-- Here are the standard definitions in Lean's library
+#check (@Or.inl)
+#check (@Or.inr)
+#check (@Or.elim)
+
+/- @@@
+The same angle bracket notation used for `Iff.intro`
+doesn't apply here because `∨` is *not* a pair (product)
+type. It's a sum type: a value is *either* a left proof
+or a right one. We therefore use `Or.inl` and `Or.inr`
+to *construct* disjunctions, and `Or.elim` (or `cases`
+in Lean's *tactic language*) to *consume/use* them.
+@@@ -/
+
+example
+  (P Q : Prop)
+  (p : P) :
+  P ∨ Q := Or.inl p  -- left introduction
+
+example
+  (P Q : Prop)
+  (q : Q) :
+  P ∨ Q := Or.inr q  -- right introduction
+
+
+/- @@@
+A common pattern: to prove R from P ∨ Q, provide two
+mini-derivations, one from P to R and one from Q to R,
+then apply `Or.elim`. Providing the mini-derivations
+(proofs of P → R and of Q → R constitutes the *case
+analysis*. In a nutshell you need to consider both of
+the possible cases for a proof of P ∨ Q and show that
+in either case R follows.)
+@@@ -/
+
+
+example (x : Nat) : x = 4 ∨ x = 2 → x % 2 = 0 :=
+  fun (h : x = 4 ∨ x = 2) =>
+    -- Show x%2 = 0 in either case (!!!)
+    Or.elim h     -- two remaining proofs needed
+    -- proof left case: if x = 4 then x%2 = 0
+    (
+      fun xeq4 => by rw [xeq4]
+    )
+    -- proof right case: if x = 2 then x%2 = 0
+    (
+      fun xeq2 => by rw [xeq2]
+    )
+
+/- @@@
+Because x%2=0 is true in either case, whether
+x=4 or x=2, and at least one of those cases is
+true (by *h*), it must be that x%2=0.
 @@@ -/
 
 /- @@@
-Okay, if you insist, it's called
-Or.elim. It's type expresses the
-fundamental way to reason from a
-proof of a disjunction to some
-other conclusion. Let's expand
-this out.
+## Theorems:
 
-Let K be the proposition P ∨ Q.
-Now suppose we want to prove that
-if K is true so must be some third
-proposition, R. So the situation is
-that we want to prove K → R.
+From these rules we can derive useful properties.
 
-That's an implication. It will suffice
-to present a function that if given any
-proof of K will return a proof of R. But
-a proof of K is by definition a proof of
-P ∨ Q. So the situation is that we need
-a function, (ifpqr : P ∨ Q → R).
-
-Now view P ∨ Q → R, with P, Q, and R
-being arbitrary propositions, as being
-a candidate general reasoning principle.
-Is this a valid pattern for deductive
-reasoning?  To be valid it has to work
-no matter what P, Q, and R really are.
-Does it?
-
-Let *M, S,* and *A* be these propositions
-
-- *M:* Tom makes money selling music
-- *S*: Tom makes money from his salary
-- *A*, Tom can afford the basics
-
-Tom wants to know, is it true, that if
-he makes money selling must *Or* makes
-money from salary that he'll be able to
-afford the basics. In formal logic, this
-is (M ∨ S) → A.
-
-Let's just to the reasoning. Assume that
-Tom gets royalties or salary and he wants
-to know that he's financially ok. Clearly
-knowing just that he gets royalties or he
-gets salary isn't enough to know that in
-all cases he will be financially ok.
-
-Question: What assumptions (assumed facts)
-would you need in addition to (h : M ∨ S),
-to know for sure that *A* follows?
-
-To get to the answer, assume we're given
-a proof, *(h : M ∨ S)*. To prove *A* given
-*h* we need a function that if given such
-any *h* derives and returns a proof of *A.
-
-So let's try to define the derivation and
-see where we get stuck.
+### ∧ is Commutative
 @@@ -/
 
-axiom Music : Prop    -- M
-axiom Salary : Prop   -- S
-axiom Okay : Prop     -- O
+-- Commutativity: P ∨ Q ↔ Q ∨ P
+theorem comm {P Q : Prop} (h : P ∨ Q) : Q ∨ P :=
+  Or.elim h
+    (fun p => Or.inr p)
+    (fun q => Or.inl q)
 
-theorem t1 : Music ∨ Salary → Okay :=
--- start from just a place holder, _, and expand back to this:
-fun (h : Music ∨ Salary) =>   -- assume proof h of M ∨ S
-_
+-- EXERCISE: Render this proof in natural language
 
 /- @@@
-From here it looks hopeless. We have *h*,
-a proof of *M ∨ S*, but we need a proof of
-*O*, and it seems there's no way to get from
-here to there. And there isn't. But that's
-not to say we can't make some futher progress.
-And that's where the next core lesson is.
-
-The trick is to see that we can *inspect h*
-to determine how it was constructed. If one
-knows is that *(h : M ∨ S)* then one knows
-*h* is a term in one of two possible forms:
-either *Or.inl (m : M)* or *Or.inr (s : S)*.
-
-Here's the punchline. To show that from *any*
-proof of *M ∨ S*, a proof of *O* can be derived
-now requires only that one prove two smaller
-theorems: that a proof of *O* can be derived
-from a proof of the form *Or.inl (m : M)*, and
-a proof can be derived from a proof of the form
-*Or.inl s*. Key: If you show that you can get
-a proof of *O* **in either case**, then you
-can conclude that of *M ∨ S* is true then so
-is *O*.
-
-But what are those cases, exactly, again? They
-are just the two possible forms that a proof
-of *M ∨ S* can have: an application of *Or.inl*
-to a proof (m : M)*, or the application of
-*Or.inr* to a proof $s : S$.
-
-Next critical idea: These are the only cases.
-In the first case embedded in *h* will be a proof
-*m : M*. That's really what I have to work with:
-For this first of two cases, I have to show that
-from a proof of *M* I can derive a proof of *O*.
-That is to say, I need a proof of *M → O* to be
-done with this case.
-
-Symmetrically, in the second case, it must be
-that *h = Or.inr s* for some (s : S); and I get
-at that proof when pattern matching on *h*. So,
-now the challenge to finish off this case is to
-give a definition that Lean accepts of a function
-that turn an proof (s : S) into a proof of *O*.
-That is, again, to say, for the second and last
-possible case for *h*, I need a proof of *S → O*.
-
-Summing up, if in addition to a proof of *M ∨ S*
-I have proofs of *M → O* and of *S → O* then at
-last I can derive a proof of *O*.
-
-So is Tom financially ok? We now have the answer.
-If he makes money from music *Or* he makes money
-from salary, and he wants to know he's okay, he
-needs to know/show M → O (if he makes money from
-music, he'll be okay) and he also needs to know
-S → O (if he makes money from salary he'll be ok).
-
-So there finally we have the principle by which we
-can use a proof of a disjuction. Do case analysis,
-in Lean using *match*. Then show that the conclusion
-is true in each case.
+### False is a Left Identity for ∨
 @@@ -/
 
--- Assume Tom works at least one of the two jobs
-axiom h : Salary ∨ Music
-
--- Assume the first pays enough to be ok
-axiom mo : Music → Okay
-
--- Assume the second one pays enough to be ok
-axiom so : Salary → Okay
-
--- Now Tom can be confident that he'll be okay
-#check Or.elim h so mo                   -- h : Music ∨ Salary ⊢ Okay
--- Or.elim h so mo : Okay
+-- Left identity with False: (False ∨ P) →  P
+theorem false_or_left {P : Prop} (h : False ∨ P) : P :=
+  Or.elim h
+    (fun f => False.elim f)
+    (fun p => p)
 
 /- @@@
-Now you are ready to read, parse, and
-understand the type of Or.elim.
+You can also *introduce* False ∨ P from P (right intro),
+and together these yield False ∨ P ↔ P (exercise).
 @@@ -/
-
-#check Or.elim
 
 /- @@@
-It's can be easier to read complex type
-expressions when they're broken across lines.
+### Case-Analysis in the Example World
 
-```lean
-Or.elim           -- applying Or.elim to ...
-  {a b c : Prop}  -- implicitly assumed types
-  (h : a ∨ b)     -- assumed proof of *a ∨ b*
-  (left : a → c)  -- assumed proof of a → c
-  (right : b → c) -- assume proof of b → c:
-: c              -- constructs a proof of c
-```
+Back to our emergencies: from `Fire ∨ Flood` we can
+deduce `Alarm` by case analysis with the system laws.
 @@@ -/
+
+theorem either_emergency_triggers_alarm
+  (h : Fire ∨ Flood) (fireToAlarm : Fire → Alarm) (floodToAlarm : Flood → Alarm): Alarm :=
+  Or.elim h fireToAlarm floodToAlarm
+
+/- @@@
+Now there's another way to write this proof in Lean,
+and that's using pattern matching to destructure *h*
+into either *Or.inl (f : Fire)* or *Or.inr (f : Flood)*.
+@@@ -/
+
+example
+  (h : Fire ∨ Flood)
+  (fireToAlarm : Fire → Alarm)
+  (floodToAlarm : Flood → Alarm)
+: Alarm :=
+  match h with  -- h can only be one of the following
+  | Or.inl f => fireToAlarm f   -- f is proof of fire
+  | Or.inr f => floodToAlarm f  -- f is proof of flood
+
+/- @@@
+The first case in the match shows that from a proof
+of Fire ∨ Flood from a proof of fire we can derive a
+proof Alarm, by applying fireToAlarm to f. There is
+only one more possible way for First ∨ Flood to be
+true, and that's from a proof of flood. In this case
+applying floodToAlarm such a proof of flood would give
+a proof of alarm.
+
+In short, if First ∨ Flood is true *and in either case*
+Alarm is true, then Alarm is true. This is how one uses
+a proof of a disjunction. You have to show that a proof
+of the goal can be constructed *in either case*.
+@@@ -/
+
+/- @@@
+Finally we'll note that the match construct is notation
+for application of the elimination rule for h, which is
+to say, Or.elim. The two proof arguments are crucial in
+enabling a proof of Alarm to be constructed *in either
+case*, one from a proof of first, and one from a proof
+of Flood.
+@@@ -/
+
+
+/- @@@
+### Exercises
+
+Fill in the proofs (replace `sorry`) using `Or.inl`,
+`Or.inr`, and `Or.elim` as appropriate, or by giving
+a longer proof if needed.
+@@@ -/
+
+-- 1) From P, construct P ∨ Q; from Q, construct P ∨ Q.
+theorem or_intro_left {P Q : Prop} (p : P) : P ∨ Q :=
+  sorry
+
+theorem or_intro_right {P Q : Prop} (q : Q) : P ∨ Q :=
+  sorry
+
+-- 2) From P ∨ Q and P → R and Q → R, derive R.
+theorem or_elim_to {P Q R : Prop}
+  (h : P ∨ Q) (f : P → R) (g : Q → R) : R :=
+  sorry
+
+-- 3) Show False ∨ P ↔ P (hint: two implications).
+theorem false_or_iff {P : Prop} : False ∨ P ↔ P :=
+  sorry
+-- Recall False elim: ∀ P : Prop, False → P (ending any proof)
+
+-- 4) Commutativity, again, but as an equivalence.
+theorem or_comm_iff {P Q : Prop} : P ∨ Q ↔ Q ∨ P :=
+  sorry
+
+-- 4) Commutativity, again, but as an equivalence.
+theorem or_assoc_iff {P Q R : Prop} : P ∨ Q ∨ R ↔ (P ∨ Q) ∨ P :=
+  sorry
+
+end OrInference
