@@ -257,6 +257,7 @@ theorem or_elim_to {P Q R : Prop}
 -- 3) Show False ∨ P ↔ P (hint: two implications).
 theorem false_or_iff {P : Prop} : False ∨ P ↔ P :=
   sorry
+-- Recall False elim: ∀ P : Prop, False → P (ending any proof)
 
 -- 4) Commutativity, again, but as an equivalence.
 theorem or_comm_iff {P Q : Prop} : P ∨ Q ↔ Q ∨ P :=
@@ -265,25 +266,5 @@ theorem or_comm_iff {P Q : Prop} : P ∨ Q ↔ Q ∨ P :=
 -- 4) Commutativity, again, but as an equivalence.
 theorem or_assoc_iff {P Q R : Prop} : P ∨ Q ∨ R ↔ (P ∨ Q) ∨ P :=
   sorry
-
-/- @@@
-## Summary: ∨ axioms and theorems
-
-Here's a summary of the axioms/rules for ∨, written
-assuming P, Q, and R are propositions.
-
-Axioms (inference rules):
-
-- Or.inl : P → P ∨ Q
-- Or.inr : Q → P ∨ Q
-- Or.elim : P ∨ Q → (P → R) → (Q → R) → R
-
-Some derived theorems (deductions from axioms):
-
-- comm : (P ∨ Q) → (Q ∨ P)
-- false_or_left : (False ∨ P) → P
-- either_emergency_triggers_alarm : (Fire ∨ Flood) → Alarm
-- (many more in Lean’s library: `Or.comm`, `Or.assoc`, etc.)
-@@@ -/
 
 end OrInference
