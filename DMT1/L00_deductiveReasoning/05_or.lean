@@ -114,7 +114,7 @@ in Lean's *tactic language*) to *consume/use* them.
 example
   (P Q : Prop)
   (p : P) :
-  P ∨ Q := Or.inl p  -- left introduction
+  P ∨ Q := Or.inl p
 
 example
   (P Q : Prop)
@@ -132,19 +132,47 @@ the possible cases for a proof of P ∨ Q and show that
 in either case R follows.)
 @@@ -/
 
-
 example (x : Nat) : x = 4 ∨ x = 2 → x % 2 = 0 :=
   fun (h : x = 4 ∨ x = 2) =>
     -- Show x%2 = 0 in either case (!!!)
-    Or.elim h     -- two remaining proofs needed
-    -- proof left case: if x = 4 then x%2 = 0
-    (
-      fun xeq4 => by rw [xeq4]
-    )
-    -- proof right case: if x = 2 then x%2 = 0
-    (
-      fun xeq2 => by rw [xeq2]
-    )
+    Or.elim h
+       (fun (h : x = 4) => by rw [h])
+       (fun (h : x = 2) => by rw [h])
+
+inductive Person : Type
+  | Billy (n : Nat): Person
+  | Mary (n : Nat): Person
+
+#check Person.Billy 5
+
+
+open Person
+
+def age : Person → Nat :=
+  fun (f : Person) => match f with
+  | Billy n => n
+  | Mary n  => n
+
+
+#check Or
+
+/-
+inductive Or (a b : Prop) : Prop where
+  | inl (h : a) : Or a b
+  | inr (h : b) : Or a b
+-/
+
+example (x : Nat) : x = 4 ∨ x = 2 → x % 2 = 0 :=
+  fun (h : x = 4 ∨ x = 2) => match h with
+  | Or.inl p => _
+  | Or.inr q => _
+
+example {P Q : Prop} : ¬(P ∨ Q) → ¬P ∧ ¬Q :=
+  fun nPorQ =>
+    And.intro
+      (fun p => nPorQ (Or.inl p))
+      (fun q => nPorQ (Or.inr q))
+
 
 /- @@@
 Because x%2=0 is true in either case, whether
