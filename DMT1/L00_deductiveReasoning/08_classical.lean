@@ -6,20 +6,94 @@
 -- Both directions are constructively valid!
 
 theorem demorgan_or_to_and {P Q : Prop} : ¬(P ∨ Q) → (¬P ∧ ¬Q) :=
-  fun h => ⟨fun hp => h (Or.inl hp), fun hq => h (Or.inr hq)⟩
+  (
+    fun (nporq : ¬(P ∨ Q)) =>
+      And.intro
+      (
+        fun p =>
+        (
+          nporq (Or.inl p)
+        )
+      )
+      (
+        fun q =>
+        (
+          nporq (Or.inr q)
+        )
+      )
+  )
+
+--fun h => ⟨fun hp => h (Or.inl hp), fun hq => h (Or.inr hq)⟩
 
 theorem demorgan_and_to_or {P Q : Prop} : (¬P ∧ ¬Q) → ¬(P ∨ Q) :=
-  fun ⟨hnp, hnq⟩ hpq => hpq.elim hnp hnq
+  (
+    fun h =>
+      (
+        fun porq =>
+        (
+          let np := h.left
+          let nq := h.right
+          match porq with
+          | Or.inl p => np p
+          | Or.inr q => nq q
+        )
+      )
+  )
+
+--fun ⟨hnp, hnq⟩ hpq => hpq.elim hnp hnq
 
 theorem demorgan_or_iff {P Q : Prop} : ¬(P ∨ Q) ↔ (¬P ∧ ¬Q) :=
-  ⟨demorgan_or_to_and, demorgan_and_to_or⟩
+(
+  Iff.intro demorgan_or_to_and demorgan_and_to_or
+)
+-- ⟨demorgan_or_to_and, demorgan_and_to_or⟩
 
 /- @@@ ## The "Hard" DeMorgan Law: ¬(P ∧ Q) vs (¬P ∨ ¬Q) @@@ -/
 
 -- One direction is constructively valid
 
 theorem demorgan_or_neg_to_neg_and {P Q : Prop} : (¬P ∨ ¬Q) → ¬(P ∧ Q) :=
-  fun h ⟨hp, hq⟩ => h.elim (fun hnp => hnp hp) (fun hnq => hnq hq)
+(
+  fun h =>
+  (
+    fun pandq =>
+    (
+      let p := pandq.left
+      let q := pandq.right
+      Or.elim h
+      (
+        fun np =>
+        (
+          np p
+        )
+      )
+      (
+        fun nq =>
+        (
+          nq q
+        )
+      )
+    )
+  )
+)
+-- fun h ⟨hp, hq⟩ => h.elim (fun hnp => hnp hp) (fun hnq => hnq hq)
+
+theorem foo { P Q : Prop } : ¬(P ∧ Q) → (¬P ∨ ¬Q) :=
+fun h =>
+(
+  Or.inl
+  {
+    fun p => _
+  }
+)
+
+theorem negElim {P : Prop} : ¬¬P → P :=
+(
+  fun h =>
+  (
+    
+  )
+)
 
 -- The other direction is NOT constructively valid!
 -- We cannot prove: ¬(P ∧ Q) → (¬P ∨ ¬Q)
