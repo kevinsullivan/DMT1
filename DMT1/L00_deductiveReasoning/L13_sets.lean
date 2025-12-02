@@ -145,7 +145,8 @@ apply And.intro
 Here's the same propositioo now expressed fully
 in the language of set theory. In English it asserts
 that 3 is in the intersection of fewNats and fewNats'.
-EXERCISE: PROVE IT
+
+EXERCISE: PROVE IT YOURSELF
 @@@ -/
 example : 3 ∈ (fewNats ∩ fewNats') := by
 sorry
