@@ -1,4 +1,5 @@
 import Mathlib.Data.Set.Basic
+
 namespace DMT1.L08_setsRelationsFunctions.sets
 
 /- @@@
@@ -133,12 +134,19 @@ between sets and predicates.
 /- @@@
 Example: Can't directly treat Prop as Set
 @@@ -/
+
+-- Here's a proposition
 def aNatProp : Nat → Prop := λ n => True
+
+-- It's not declared as a set, so set notation not available
 -- #check 1 ∈ aNatProp       -- won't work
 
+-- The *setOf* function takes a Prop and "lifts" it to being a Set
 def s : Set Nat := setOf aNatProp   -- can coerce prop to set
 #check 1 ∈ s              -- gain set language and notations
 #check (s 1)              -- this "works" but is unpreferred
+
+-- One can always treat a set as merely a logical prediate
 def t : Nat → Prop := s   -- can treat set as prop
 
 /- @@@
@@ -323,8 +331,9 @@ Or.inr
   )
 )
 
+-- EXERCISE
 example : ∃ (n : Nat), n ∈ small_set :=
-Exists.intro 0 (Or.inl rfl)
+  sorry
 
 
 /- @@@
@@ -827,4 +836,4 @@ r ⊆ s × t, or r ∈ 𝒫 (s × t.)
 #reduce @Set.powerset (Set.prod _ _)
 -- fun s t => t ⊆ s
 
-end DMT.setsRelationsFunctions.sets
+end DMT1.L08_setsRelationsFunctions.sets

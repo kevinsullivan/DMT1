@@ -51,13 +51,33 @@ variable
 It is also commplace to specify binary relations as
 binary predicates. Moreover, just as Lean typically
 represents sets as unary predicates, it represents
-binary relations as binary predicates. To this end,
-Lean defines *(Rel α β)* as *α → β → Prop*, as the
-type of binary relation from objects of type α to
-objects of type β.
+binary relations as binary predicates.
+
+KEY IDEA: To this end, Lean defines *(Rel α β)* as
+*α → β → Prop*, as the type of binary relation from
+objects of type α to objects of type β.
 @@@ -/
 
 #reduce (types := true) Rel α β -- is α → β → Prop
+
+
+/- @@@
+You can think of this predicate as specifying the
+set of all *pairs* of values, *(a : α, b : β) that
+satisfy the given predicate.
+
+For example, here's how we could represent/specify
+the binary relation on Nat containing all and only
+those pairs of natural numbers where the first is
+less than the second.
+@@@ -/
+
+def ltPred : Nat → Nat → Prop := fun n1 n2 => n1 < n2
+
+/- @@@
+In this class we'll mainly focus on situations where
+α = β, e.g., on binary relations on *Nat*.
+@@@ -/
 
 /- @@@
 ## Example: The Relation \{ (0, 1), (1, 1), (1, 0) \}

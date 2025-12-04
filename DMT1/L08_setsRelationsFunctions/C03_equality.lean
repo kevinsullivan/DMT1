@@ -263,4 +263,4 @@ terms where all terms in the same class reduce to the same value (e.g.,
 more detail in the next chapter.
 @@@ -/
 
-end DMT.setsRelationsFunctions.equality
+end DMT1.L08_setsRelationsFunctions.equality
