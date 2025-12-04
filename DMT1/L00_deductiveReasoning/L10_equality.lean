@@ -153,12 +153,6 @@ a proof the proposition, *isEven (2 + 2)*.
   )
 
 
-
-
-
-
-
-
 /- @@@
 ## Theorems
 
@@ -168,7 +162,15 @@ represented by the *Eq* predicate to specify
 
 ### The Concept of a Relation
 
+A relation can usually be viewed as a set of
+*tuples* of some particular type. A tuple, in
+turn, is a finite-length ordered singleton,
+pair, triple, or n-tuple more generally, for
+any n > 0.
 
+As an example of a 3-tuple of Nat values,
+consider the set of triples (a, b, c) such
+that *a^2 + b^2 = c^2*.
 
 ### Equality is Reflexive
 
