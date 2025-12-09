@@ -1,14 +1,32 @@
 /- @@@
+# Induction
+
 The data type makes all the difference. For types with just a
-few basic values, induction is equivalent to case analysis. The
-power of induction emerges for recursively defined types.
+few basic values, induction is equivalent to case analysis. If
+you give code to compute an answer for each of the three cases
+of a type with three values, then you've got a total function.
+If you give a proof of some proposition, P x, where P is some
+predicate, for each of the three values that x could (assuming
+it comes from a type with three values), then you've got a proof
+of ∀ x, P x.
+
+The real power of induction emerges for recursively defined types
+with an infinite number of values. A good example is Nat. Another
+good example is List α, where α is any type, and List α is then
+the type of lists of type α.
 
 In these cases, induction gives more than mere case analysis on
 constructors: it gives you the *assumptions* enumerated in the
-statement of the induction axiom itself, so now, if from those
-*assumptions* you can deliver a valid result, then you will have
-shown that you can always combine results for smaller values of
-an argument, n, into results for a next larger result for n + 1.
+the induction axiom itself. For Nat, for example, the induction
+axiom says that if you give an answer for 0 and you give a step
+function, able to compute an answer for n+1 *assuming* you have
+n and the answer for n (your induction hypotheses) then you can
+compute an answer for any *n*, namely by applying the step function
+n times to the answer for 0. In this way, you can compute an answer
+(could be an ordinary value or a proof) for *all* n. The induction
+axiom makes this possible.
+
+## Computing Total Functions Using Induction
 
 Look at applying Nat induction (Nat.rec) to infer a total function
 from Nat, such as sumUp : Nat → Nat or factorial : Nat → Nat. THe
@@ -168,3 +186,47 @@ way you'll need to define isEven and isOdd predicates, among other
 things. Use proof by direct application of the Nat.rec induction
 axiom.
 @@@ -/
+
+/- @@@
+## Proof by Induction
+
+Proof by induction works exactly the same way: prove ∀ x : α, P x
+by induction by giveing proofs of P x is true for all base values
+of x. For Nat, the one base case is Nat.Zero. For List α the base
+case is List.nil, also written as []. Let's see the idea in action
+with a proof by induction of ∀ (n : Nat), isEvenOrOdd n. First we
+have to define our terms of course.
+@@@ -/
+
+def isEven (n : Nat) : Prop := n % 2 = 0
+def isOdd (n : Nat) : Prop := n % 2 = 1
+
+-- Define property you want to prove for all Nat
+def P (n : Nat) : Prop := isEven n ∨ isOdd n
+
+-- Defne the goal of proving every n has that property
+def goal : Prop := ∀ (n : Nat), P n
+
+-- Proof by Nat induction
+
+-- Step 1: give proof for 0
+def propertyZero : P 0 := Or.inl rfl
+
+-- Step 2: give proof of induction hypothesis: from n and proof for n derive proof for n+1
+def propertySucc : (n : Nat) → (h : P n) → P (n + 1) := by
+  intro n h
+  -- unfold names to meanings
+  unfold P isEven isOdd
+  unfold P isEven isOdd at h
+  -- involves a bunch of low-level arithmetic reasoning -- we'll let Lean handle that
+  grind
+
+-- Step 3: Apply induction axio for Nat
+example : ∀ (n : Nat), P n  := (Nat.rec (motive := fun n => P n) propertyZero propertySucc)
+
+-- Step 4 (optional): Apply universal proof to get proofs for individual Nat values
+#check (Nat.rec (motive := fun n => P n) propertyZero propertySucc) 0
+#check (Nat.rec (motive := fun n => P n) propertyZero propertySucc) 1
+#check (Nat.rec (motive := fun n => P n) propertyZero propertySucc) 2
+
+-- QED. That was our goal.
